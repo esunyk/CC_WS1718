@@ -1,0 +1,8 @@
+S -> SourceFile
+SourceFile -> PackageDeclaration ImportDeclaration TopLevelDeclaration Body
+PackageDeclaration -> ^package$ Identifier [;]
+ImportDeclaration -> epsilon
+TopLevelDeclaration -> epsilon
+Body -> ^func$ ^main$ [(] [)] [{] Code [}]
+Code -> epsilon
+Identifier -> [_a-zA-Z][_a-zA-Z0-9]*

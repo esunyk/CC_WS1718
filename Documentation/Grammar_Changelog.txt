@@ -1,0 +1,8 @@
+Date: 03.11.2017
+Corresponding test files: Correct_Test_0, Incorrect_Test_0, Incorrect_Test_1, Incorrect_Test_2, Incorrect_Test_3, Incorrect_Test_4, Incorrect_Test_5
+Additons to Go subset:
+-package declaration
+-main loop (empty)
+Additional Information: 
+-semicolons are required where optional in full version of Go
+-identifiers can only be alphanumeric and contain _

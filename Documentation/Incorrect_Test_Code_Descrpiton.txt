@@ -1,0 +1,23 @@
+File: Incorrect_Test_0
+Error: "main" and "func" are swapped
+Possible error Messages: "Unexpected <token>" 
+
+File: Incorrect_Test_1
+Error: Missing left paranthesis
+Possible error Messages: "Right parenthesis found before left one" | "Unexpected right parenthesis"
+
+File: Incorrect_Test_2
+Error: missing right paranthesis
+Possible error Messages: "Reached end of file without finding right paranthesis"
+
+File: Incorrect_Test_3
+Error: missing parantheses
+Possible error Messages: "Parantheses not found" 
+
+File: Incorrect_Test_4
+Error: missing semicolon
+Possible error Messages:  "Unexpected <next token>"
+
+File: Incorrect_Test_5
+Error: missing main function
+Possible error Messages:  "main function not found"
