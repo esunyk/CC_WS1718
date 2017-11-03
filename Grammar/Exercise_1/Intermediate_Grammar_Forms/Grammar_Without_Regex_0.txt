@@ -1,7 +1,8 @@
 S -> SourceFile
-SourceFile -> PackageDeclaration ImportDeclaration TopLevelDeclaration Body
+SourceFile -> PackageDeclaration ImportDeclaration Body
+Body -> TopLevelDeclaration MainFunc TopLevelDeclaration
 PackageDeclaration -> package identifier semicolon
 ImportDeclaration -> epsilon
 TopLevelDeclaration -> epsilon
-Body -> func main lparen rparen lcurly Code rcurly
+MainFunc -> func main lparen rparen lcurly Code rcurly
 Code -> epsilon
