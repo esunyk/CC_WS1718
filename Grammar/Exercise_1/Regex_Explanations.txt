@@ -11,5 +11,5 @@ Regex: [a-z]*
 Explanation: matches zero or more lowercase letters from the alphabet
 
 Regex: [a-zA-Z]
-Explanatin: matches exactly one letter from the alphabet
+Explanation: matches exactly one letter from the alphabet
 

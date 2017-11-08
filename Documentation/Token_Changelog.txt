@@ -1,2 +1,0 @@
-Date: 03.11.17
-Changes: Inital Token Definition (corresponding to Correct_Test_0)

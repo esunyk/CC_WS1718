@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2016.11.10)  3 NOV 2017 19:27
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2016.11.10)  8 NOV 2017 22:17
 entering extended mode
 **"./Token Table.tex"
 ("Token Table.tex"
@@ -551,23 +551,23 @@ Package grfext Info: Graphics extension search list:
 G,.JBIG2,.JB2,.eps]
 (grfext)             \AppendGraphicsExtensions on input line 456.
 )
-LaTeX Font Info:    Try loading font information for U+msa on input line 32.
+LaTeX Font Info:    Try loading font information for U+msa on input line 35.
 
 ("D:\Programme\MiKTeX 2.9\tex\latex\amsfonts\umsa.fd"
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 32.
+LaTeX Font Info:    Try loading font information for U+msb on input line 35.
 
 ("D:\Programme\MiKTeX 2.9\tex\latex\amsfonts\umsb.fd"
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 32.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 35.
 
 ("D:\Programme\MiKTeX 2.9\tex\latex\base\omscmr.fd"
 File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 32.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 35.
  [1
 
 {C:/Users/Muffin/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}] ("Token Ta
@@ -575,14 +575,14 @@ ble.aux") )
 Here is how much of TeX's memory you used:
  3146 strings out of 493334
  39315 string characters out of 3140968
- 110397 words of memory out of 3000000
+ 111397 words of memory out of 3000000
  6626 multiletter control sequences out of 15000+200000
  5339 words of font info for 22 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  40i,9n,25p,248b,282s stack positions out of 5000i,500n,10000p,200000b,50000s
 <D:/Programme/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><D
 :/Programme/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
-Output written on "Token Table.pdf" (1 page, 30215 bytes).
+Output written on "Token Table.pdf" (1 page, 31031 bytes).
 PDF statistics:
  14 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)

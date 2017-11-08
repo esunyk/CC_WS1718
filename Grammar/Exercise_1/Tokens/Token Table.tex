@@ -17,7 +17,8 @@
 \begin{tabular}{@{}llllll@{}}
 \hline
  Token & Token Name & Token Class & Informal Description (regex) & Formal Description & Example(s)  \\ \midrule
- Identifier & tok\_id & identifier & at least one char, alphanumeric with \_ & [\_a-zA-Z][\_a-zA-Z0-9]* & i, myId, \_abc, var1 \\
+ Identifier & tok\_id & identifier & at least one char, alphanumeric with \_ & [\_a-zA-Z][\_a-zA-Z0-9]* & i, myId, \_abc, \_ var1 \\
+  Package Identifier & tok\_pid & identifier & at least one char, alphanumeric, cannot be blank identifier & [a-zA-Z] OR  [\_a-zA-Z][\_a-zA-Z0-9][\_a-zA-Z0-9]* & main, \_abc \\
  ( & tok\_lparen & punctuation & - & [(] & -  \\
  ) & tok\_rparen & punctuation & - & [(] & - \\
  \{ & tok\_lcurly & punctuation & - & [\{] & - \\
@@ -27,7 +28,9 @@
  Package Declaration & tok\_package & reserved keyword & letters  "p" "a" "c" "k" "a" "g" "e" & \textasciicircum package\$ & -  \\
  Function Declaration & tok\_func & reserved keyword & letters  "f" "u" "n" "c" & \textasciicircum func\$  & - \\
  EOF & tok\_eof & reserved & - & [\textbackslash{Z}] & - \\
- &  &  &  &  &  \\ \bottomrule
+ Import & tok\_imp & reserved keyword & letters  "i" "m" "p" "o" "r" "t" & \textasciicircum import\$& - \\
+ Variable declaration & tok\_var & reserved keyword & letters  "v" "a" "r" & \textasciicircum var\$& - \\
+\bottomrule
 \end{tabular}%
 }
 \end{table}

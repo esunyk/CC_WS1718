@@ -1,8 +1,29 @@
 Date: 03.11.2017
+Version: 0
 Corresponding test files: Correct_Test_0, Incorrect_Test_0, Incorrect_Test_1, Incorrect_Test_2, Incorrect_Test_3, Incorrect_Test_4, Incorrect_Test_5
+Incorrect_Test_6, Incorrect_Test_7, Incorrect_Test_8
 Additons to Go subset:
 -package declaration
 -main loop (empty)
 Additional Information: 
 -semicolons are required where optional in full version of Go
 -identifiers can only be alphanumeric and contain _
+
+Date: 08.11.2017
+Version: 0.1
+Corrections:
+-package with func main must be named main, package name cannot be blank identifier -> corrected to reflect
+
+Date: 08.11.2017
+Version: 0.2
+Corrections:
+-corrected 0.1 to make recursive descent parsing possible
+
+Date: 08.11.2017
+Corresponding test files: Correct_Test_1, Correct_Test_2, [INCORRECT TESTS TO BE ADDED]
+Additions to Go subset:
+-import statement
+-variables: short, long, static, dynamic, top-level, in-function
+-function call
+-string literals (standard, not raw)
+
