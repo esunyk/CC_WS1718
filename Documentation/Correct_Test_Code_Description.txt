@@ -4,12 +4,7 @@ Description: Simplest possible test code, includes package declaration and empty
 
 File Name: Correct_Test_1
 Date: 08.11.2017
-Description: code adapted from golang tour example on short variable declarations: includes import statement without brackets
-,various variable declarations, a standard string literal, and a function call to the imported library
-
-File Name: Correct_Test_2
-Date: 08.11.2017
-Description: same as Correct_Test_1, only with the import statement in brackets
-
+Description: code adapted from golang tour example on short variable declarations: includes various variable declarations, 
+a function declaration, a call to the function and a line comment
 
   

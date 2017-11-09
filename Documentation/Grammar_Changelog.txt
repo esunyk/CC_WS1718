@@ -19,11 +19,16 @@ Version: 0.2
 Corrections:
 -corrected 0.1 to make recursive descent parsing possible
 
-Date: 08.11.2017
-Corresponding test files: Correct_Test_1, Correct_Test_2, [INCORRECT TESTS TO BE ADDED]
+Date: 09.11.2017
+Version: 0.21
+Corrections:
+-improved regex (tokens)
+
+Date:
+Corresponding test files: Correct_Test_1, [INCORRECT TESTS TO BE ADDED]
 Additions to Go subset:
--import statement
--variables: short, long, static, dynamic, top-level, in-function
--function call
--string literals (standard, not raw)
+-simple function declarations
+-variable declaration and assignment: short, long, static, dynamic, top-level, in-function
+-function calls
+-line comments
 

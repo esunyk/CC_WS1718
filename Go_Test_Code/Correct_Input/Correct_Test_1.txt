@@ -1,13 +1,13 @@
 package main;
 
-import ("fmt";);
-
 func main() {
-	var i, j int = 1, 2;
+	var i, j int = 1, 2; //this is a line comment
 	k := 3;
-	c, python, java := true, false, "no!";
-
-	fmt.Println(i, j, k, c, python, java, a);
+	c, python := true, false;
+	f(i, j, k, c, python);
 }
 
 var a = 4;
+
+func f(x int, y int, z int, b bool, d bool){
+}
