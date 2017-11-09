@@ -1,4 +1,4 @@
-\documentclass[10pt,a4paper]{article}
+ \documentclass[10pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 \usepackage{amsmath}
@@ -16,20 +16,20 @@
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}llllll@{}}
 \hline
- Token & Token Name & Token Class & Informal Description (regex) & Formal Description & Example(s)  \\ \midrule
+ Token & Token Name & Token Class & Informal Description & Formal Description (regex) & Example(s) \\ \midrule
  Identifier & tok\_id & identifier & at least one char, alphanumeric with \_ & [\_a-zA-Z][\_a-zA-Z0-9]* & i, myId, \_abc, \_ var1 \\
-  Package Identifier & tok\_pid & identifier & at least one char, alphanumeric, cannot be blank identifier & [a-zA-Z] OR  [\_a-zA-Z][\_a-zA-Z0-9][\_a-zA-Z0-9]* & main, \_abc \\
- ( & tok\_lparen & punctuation & - & [(] & -  \\
- ) & tok\_rparen & punctuation & - & [(] & - \\
- \{ & tok\_lcurly & punctuation & - & [\{] & - \\
- \} & tok\_rcurly & punctuation & - & [\}] & - \\
-  ; & tok\_semicolon & punctuation & - & [;] & - \\
- Main & tok\_main & reserved keyword & letters "m" "a" "i" "n" & \textasciicircum main\$ & - \\
- Package Declaration & tok\_package & reserved keyword & letters  "p" "a" "c" "k" "a" "g" "e" & \textasciicircum package\$ & -  \\
- Function Declaration & tok\_func & reserved keyword & letters  "f" "u" "n" "c" & \textasciicircum func\$  & - \\
- EOF & tok\_eof & reserved & - & [\textbackslash{Z}] & - \\
- Import & tok\_imp & reserved keyword & letters  "i" "m" "p" "o" "r" "t" & \textasciicircum import\$& - \\
- Variable declaration & tok\_var & reserved keyword & letters  "v" "a" "r" & \textasciicircum var\$& - \\
+  Package Identifier & tok\_pid & identifier & at least one char, alphanumeric, cannot be blank identifier & [a-zA-Z] OR  [\_a-zA-Z][\_a-zA-Z0-9]+ & main, \_abc \\
+ ( & tok\_lparen & punctuation & - & \textbackslash( & -  \\
+ ) & tok\_rparen & punctuation & - & \textbackslash( & - \\
+ \{ & tok\_lcurly & punctuation & - & \textbackslash \{ & - \\
+ \} & tok\_rcurly & punctuation & - & \textbackslash \} & - \\
+  ; & tok\_semicolon & punctuation & - & \textbackslash ; & - \\
+ Main & tok\_main & reserved keyword & - & "main" & - \\
+ Package Declaration & tok\_package & reserved keyword & - & "package" & -  \\
+ Function Declaration & tok\_func & reserved keyword & - & "func"  & - \\
+ EOF & tok\_eof & reserved & - & "\textbackslash{Z}" & - \\
+ Import & tok\_imp & reserved keyword & - & "import" & - \\
+ Variable declaration & tok\_var & reserved keyword & - & "var" & - \\
 \bottomrule
 \end{tabular}%
 }
