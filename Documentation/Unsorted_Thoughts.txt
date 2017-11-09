@@ -1,0 +1,18 @@
+done so far:
+- read up on recursive descent parsers
+- read up on regular expressions
+- get a feeeling for go (tour, spec, write own simple programs)
+- get started on grammar without consideration for purpose
+- correct grammar for recursive descent parsing
+
+
+grammar outline:
+simplest program -> top-level declarations, variables, function calls -> expressions
+-> all operators, keywords, line comments, ... (simple tokens)
+-> pocket calculator -> String -> include statement
+-> ...
+
+problems encountered:
+-start at root or with something simple -> both, leave complicated things for later but create structure
+-productions: all alternatives at once or everything simple? -> all at once for better productions
+-how much at once? -> not more than 3, 4 new things 
