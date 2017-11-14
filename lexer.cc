@@ -1,43 +1,28 @@
 #include <iostream>
 #include <fstream>
 #include <string> 
-#include <stdio.h>
+#include "stdio.h"
 #include <stdlib.h>
+#include "Token.h"
 
-// contains 
-enum Token {
-  tok_eof = -1,
+static std::string IdentifierStr; 	// Filled in if tok_identifier
+static double NumVal;             	// Filled in if tok_number
+static std::string code;			// TODO type of input?
 
-  // primary
-  tok_id = -2,
-  tok_number = -3,		// nötig?
-
-  // commands
-  tok_pid = -4,			// unterschied id?
-  tok_lparen = -5,		// (
-  tok_rparen = -6,		// )
-  tok_lcurly = -7,		// {
-  tok_rcurly = -8,		// }
-  tok_semicolon = -9,	// ;
-  tok_main = -10,		// main
-  tok_package = -11,	// package
-  tok_func = -12,		// func
-  tok_imp = -13,		// import
-  tok_var = -14,		// var
-  tok_lcomment = -15
-};
-
-static std::string IdentifierStr; // Filled in if tok_identifier
-static double NumVal;             // Filled in if tok_number
+// TODO how to pass code to lexer?
+static void read(std::string input) {
+	code = input;
+}
 
 static int gettok() {
-  static int LastChar = ' ';
+	static int LastChar = ' ';
 
 	while (isspace(LastChar)) {
+		// read from input
 		LastChar = getchar();
 	}
 
-	if (isalpha(LastChar) || LastChar == "_") { 
+	if (isalpha(LastChar) || LastChar == '_') { 
 		IdentifierStr = LastChar;
 
 		while (isalnum((LastChar = getchar()))) {
@@ -49,7 +34,7 @@ static int gettok() {
 				return tok_main;
 
 			if (IdentifierStr == "package")
-				return tok_pckg;
+				return tok_package;
 
 			if (IdentifierStr == "func")
 				return tok_func;
@@ -65,8 +50,9 @@ static int gettok() {
 	}
 
 	// Number: [0-9.]+
-	if (isdigit(LastChar) || LastChar == '.') { 	// TODO 0.20.19 ?
-		std::string NumStr;
+	if (isdigit(LastChar)) { 
+		bool isDecimal;
+		std::string NumStr; 
 		do {
 			NumStr += LastChar;
 			LastChar = getchar();
@@ -114,7 +100,5 @@ static int gettok() {
 	return ThisChar;
 }
 
-int main() {
-	return 0;
-}
+
 

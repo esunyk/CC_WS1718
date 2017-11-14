@@ -1,8 +1,13 @@
 #include "AST.h" 
 #include <iostream>
 
+AST::AST(const std::string type) {
+	token = static_cast<Type>(strtoint(type)); 
+	value = "";
+}
+
 AST::AST(const std::string type, const std::string val) {
-	token = static_cast<Token>(strtoint(type)); 
+	token = static_cast<Type>(strtoint(type)); 
 	value = val;
 }
 
@@ -85,13 +90,14 @@ const std::string AST::inttostr(const int r) {
 	}
 }
 
+/*
 int main() {
 	
 	// sample tests
-	AST* ast1 = new AST("SourceFile", "");
-	ast1->addNode(new AST("PackageDeclarationRest", ""));
-	ast1->addNode(new AST("TopLevelDeclaration", ""));
-	AST* ast2 = new AST("VoidFuncBody", "");
+	AST* ast1 = new AST("SourceFile");
+	ast1->addNode(new AST("PackageDeclarationRest"));
+	ast1->addNode(new AST("TopLevelDeclaration"));
+	AST* ast2 = new AST("VoidFuncBody");
 	ast1->addNode(ast2);
 	ast2->addNode(new AST("Terminal", "hello"));
 	ast1->traverse();
@@ -101,4 +107,4 @@ int main() {
 	std::cout << std::endl;
 	return 0;
 }
-
+*/

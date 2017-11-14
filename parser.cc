@@ -1,6 +1,6 @@
 #include "lexer.cc"
 #include "AST.cc"
-
+#include <cstring>
 
 static int CurTok, CurBck;
 static void saveCursor() {
@@ -106,16 +106,35 @@ static void HandleSourceFile() {
 
 static void takeInput() {
 	unsigned int size = 256;
-	std::vector<char*> code;
+	std::vector<std::string> code; 
 	char input[size] = "";
-	std::cout << "Enter go code: (q to quit)" << std::endl;
-	int i = 1;
+	std::cout << "Enter go code: (# to quit)" << std::endl; 	
+	int i = 1; 
 	
 	do {
 		std::cout << i++ << " ";
-		code.push_back(input);
+		code.push_back(input);  
   		std::cin.getline(input, size);
-  	} while (input[0] != 'q');
+  	} while (input[0] != '#');
+  	
+  	/* convert vector to char* ?
+  	code.push_back(new char('\0'));
+  	char* c = new char[code.size()];
+	std::memcpy(c, code.data(), code.size()); 
+	
+	// delete vector
+	code.clear(); 
+	
+	// test
+	int id = 0;
+	while (c[id] != '\0') 
+		std::cout << *(c+id++);
+	*/
+	
+	/* test
+	for (unsigned int i = 0; i < code.size(); i++) 
+		std::cout << code.at(i);
+	*/
 } 
 
 /// S := [SourceFile]
@@ -173,13 +192,13 @@ int main(int argc, char** argv) {
 				// do something 
 				char output[100];
 				if (file.is_open()) {
-					/*
+					
 					while (!file.eof()) { 
 					
 						file >> output;
 						std::cout << output; 
 					}
-					*/
+					
 				}
 				
 				file.close(); 
