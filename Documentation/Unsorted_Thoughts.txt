@@ -16,3 +16,7 @@ problems encountered:
 -start at root or with something simple -> both, leave complicated things for later but create structure
 -productions: all alternatives at once or everything simple? -> all at once for better productions
 -how much at once? -> not more than 3, 4 new things 
+
+unsolved questions:
+-entry point "main" function: syntactic or semantic?
+-at least one function among TLD: syntactic or semantic?
