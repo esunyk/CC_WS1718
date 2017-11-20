@@ -1,4 +1,5 @@
 #include "AST.h"
+#include "Parser.h"
 #include <iostream>
 #include <cstring>
 #include <fstream>
@@ -6,19 +7,22 @@
 //TODO: call parser, work through input
 //TODO: test with test files
 
-static void takeInput() {
+static std::vector<std::string> takeInput() {
 	const int size = 256;
 	std::vector<std::string> code;
+	std::string loc = "";
 	char input[size] = "";
 	std::cout << "Enter go code: (# to quit)" << std::endl;
 	int i = 1;
 
 	do {
 		std::cout << i++ << " ";
-		code.push_back(input);
-		std::cin.getline(input, size);
-	} while (input[0] != '#');
-
+		getline(std::cin, loc);
+		if (loc != "#"){
+			code.push_back(loc);
+		}
+	} while (loc[0] != '#');
+	return code;
 	/* convert vector to char* ?
 	code.push_back(new char('\0'));
 	char* c = new char[code.size()];
@@ -39,9 +43,13 @@ static void takeInput() {
 	*/
 }
 
+static void readFile(std::string){
+
+}
+
 int main(int argc, char** argv) {
 
-	// check for arguments, if not switch to stdin
+	// check for arguments, if not switch to user menu
 	if (argc > 1) {
 		// vector of inputs?
 		std::vector<char*> input;
@@ -64,7 +72,7 @@ int main(int argc, char** argv) {
 				file.open(input.at(i));
 
 				// do something 
-				char output[100];
+				char output[512];
 				if (file.is_open()) {
 
 					while (!file.eof()) {
@@ -83,7 +91,30 @@ int main(int argc, char** argv) {
 		}
 	}
 	else {
-		takeInput();
+		/*
+		int input;
+		do{
+		std::cout << "Options: " << std::endl;
+		std::cout << "Enter go code manually: 1" << std::endl;
+		std::cout << "Read go code from file: 2" << std::endl;
+		std::cout << "Terminate Program: 3" << std::endl;
+
+		std::cin >> input;
+
+		switch (input){
+		case 1:
+			break;
+		case 2: 
+			break;
+		case 3: 
+			break;
+		default: std::cout << "Invalid option." << std::endl;
+
+		}
+		} while (input != 3);*/
+		std::vector<std::string> code = takeInput();
+		AST* finalTree = Parser::startParsing(code);
+		finalTree->traverse();
 	}
 
 	std::cin.get(); //pause for debugging purposes

@@ -1,6 +1,8 @@
 #include "AST.h" 
 #include <iostream>
 
+//TODO (maybe): subclass for leaves?
+//TODO: deal with nullptr in vector -> remove?
 AST::AST(const std::string type) {
 	token = static_cast<Type>(strtoint(type));
 	value = "";
@@ -30,7 +32,8 @@ const void AST::traverse() {
 
 	for (std::vector<AST*>::iterator it = nodes.begin(); it != nodes.end(); ++it) {
 		// TODO: structure output format
-		std::cout << "\t->" << std::endl;
+		std::cout << "\t->";
+		if (*it != nullptr)
 		(*it)->traverse();
 	}
 }

@@ -8,11 +8,22 @@
 //TODO: regex for identifiers
 static std::string IdentifierStr; 	// Filled in if tok_identifier
 static double NumVal;             	// Filled in if tok_number
-static std::string code;			// TODO type of input?
+
+static std::string code;			//single line of code
+static int position = 0;			//position within the line
+static int savedPosition;
 
 // TODO how to pass code to lexer?
 static void read(std::string input) {
 	code = input;
+}
+
+static void savePosition(){
+	savedPosition = position;
+}
+
+static void backtrack(){
+	position = savedPosition;
 }
 
 static std::string getIdentifierValue(){
@@ -20,38 +31,41 @@ static std::string getIdentifierValue(){
 }
 
 static int gettok() {
-	static int LastChar = ' ';
-
+	if (position == code.length()){
+		return tok_eof;
+	}
+	static char LastChar = ' ';
+	LastChar = code[position];
 	while (isspace(LastChar)) {
 		// read from input
-		LastChar = getchar();
+		LastChar = code[++position];
 	}
 
 	if (isalpha(LastChar) || LastChar == '_') {
 		IdentifierStr = LastChar;
 
-		while (isalnum((LastChar = getchar()))) {
+		while (isalnum((LastChar = code[++position]))) {
 			IdentifierStr += LastChar;
-
-			// if (!IdentifierStr.startWith("_")
-
-			if (IdentifierStr == "main")
-				return tok_main;
-
-			if (IdentifierStr == "package")
-				return tok_package;
-
-			if (IdentifierStr == "func")
-				return tok_func;
-
-			if (IdentifierStr == "import")
-				return tok_imp;
-
-			if (IdentifierStr == "var")
-				return tok_var;
-
-			return tok_id;
 		}
+
+		if (IdentifierStr == "main"){
+			return tok_main;
+		}
+
+		if (IdentifierStr == "package"){
+				return tok_package;
+		}
+		if (IdentifierStr == "func"){
+			return tok_func;
+		}
+		if (IdentifierStr == "import"){
+				return tok_imp;
+		}
+		if (IdentifierStr == "var"){
+			return tok_var;
+		}
+			return tok_id;
+		
 	}
 
 	// Number: [0-9.]+
@@ -60,7 +74,7 @@ static int gettok() {
 		std::string NumStr;
 		do {
 			NumStr += LastChar;
-			LastChar = getchar();
+			LastChar = code[++position];
 		} while (isdigit(LastChar) || LastChar == '.');
 
 		NumVal = strtod(NumStr.c_str(), NULL);
@@ -68,41 +82,42 @@ static int gettok() {
 		return tok_number;
 	}
 
-	if (LastChar == '(')
-		return tok_lparen;
+	int tokCode;
+	switch (LastChar){
+	case '(':
+		++position;
+		tokCode = tok_lparen;
+		break;
+	case ')':
+		++position;
+		tokCode = tok_rparen;
+		break;
+	case '{':
+		++position;
+		tokCode = tok_lcurly;
+		break;
+	case '}':
+		++position;
+		tokCode = tok_rcurly;
+		break;
+	case ';':
+		++position;
+		tokCode = tok_semicolon;
+		break;
+	case EOF:
+		//don't eat eof
+		tokCode = tok_eof;
+		break;
+	default:
+		//return ascii value of char
+		//TODO: ERROR
+		int ThisChar = LastChar;
+		LastChar = code[++position];
+		tokCode = ThisChar;
+		break;
 
-	if (LastChar == ')')
-		return tok_rparen;
-
-	if (LastChar == '{')
-		return tok_lcurly;
-
-	if (LastChar == '}')
-		return tok_rcurly;
-
-	if (LastChar == ';')
-		return tok_semicolon;
-
-	/* Comment until end of line.
-	if (LastChar == '/') {
-	do {
-	LastChar = getchar();
-	} while (LastChar != EOF && LastChar != '\n' && LastChar != '\r');
-
-	if (LastChar != EOF)
-	return gettok();
 	}
-	*/
-
-	// Check for end of file.  Don't eat the EOF.
-	if (LastChar == EOF)
-		return tok_eof;
-
-	// Otherwise, just return the character as its ascii value.
-	int ThisChar = LastChar;
-	LastChar = getchar();
-
-	return ThisChar;
+	return tokCode;
 }
 
 

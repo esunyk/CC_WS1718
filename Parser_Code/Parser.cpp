@@ -1,7 +1,12 @@
 #include "Parser.h"
 #include "Lexer.cpp"
 
-AST* Parser::S(){
+AST* Parser::startParsing(std::vector<std::string> input){
+	std::string entirecode = "";
+	for (std::string loc : input){
+		entirecode += loc;
+	}
+	read(entirecode);
 	AST* s_ast = new AST("S");
 	s_ast->addNode(SourceFile());
 	return s_ast;
@@ -13,8 +18,10 @@ AST* Parser::SourceFile(){
 	case tok_package:
 		ast->addNode(new AST("Terminal", "package"));
 		ast->addNode(PackageDeclarationRest());
+		break;
 	default:
-		ast->addNode(new AST("ERROR", "Expected package declaration, found: " + getIdentifierValue()));
+		ast->addNode(new AST("ERROR", "Expected package declaration."));
+		break;
 	}
 	return ast;
 }
@@ -25,28 +32,29 @@ AST* Parser::PackageDeclarationRest(){
 	case tok_main:
 		ast->addNode(new AST("Terminal", "main"));
 		if (gettok() == tok_semicolon){
-			ast->addNode(new AST("Terminal", ";"));
+			ast->addNode(new AST("Terminal", ";")); //necessary?
 			ast->addNode(ImportDeclaration());
 			ast->addNode(MainBody());
-			return ast;
 		}
 		else{
-			ast->addNode(new AST("ERROR", "Expected semicolon, found: " + getIdentifierValue()));
+			ast->addNode(new AST("ERROR", "Expected semicolon."));
 		}
+		break;
 	case tok_pid:
 		//TODO: lexer header to remove global variables?
 		ast->addNode(PackageIdentifier(getIdentifierValue()));
 		if (gettok() == tok_semicolon){
-			ast->addNode(new AST("Terminal", ";"));
+			ast->addNode(new AST("Terminal", ";")); //necessary?
 			ast->addNode(ImportDeclaration());
 			ast->addNode(Body());
-			return ast;
 		}
 		else{
-			ast->addNode(new AST("ERROR", "Expected semicolon, found: " + getIdentifierValue()));
+			ast->addNode(new AST("ERROR", "Expected semicolon."));
 		}
+		break;
 	default:
-		ast->addNode(new AST("ERROR", "Expected package identifier, found: " + getIdentifierValue()));
+		ast->addNode(new AST("ERROR", "Expected package identifier."));
+		break;
 	}
 	return ast;
 
@@ -54,25 +62,28 @@ AST* Parser::PackageDeclarationRest(){
 
 AST* Parser::ImportDeclaration(){
 	AST* ast = new AST("ImportDeclaration");
+	savePosition();
 	switch (gettok()){
 	case tok_imp:
-		ImportPath();
+		ImportPath(getIdentifierValue());
 		if (gettok() == tok_semicolon){
-			ast->addNode(new AST("Terminal", ";"));
+			ast->addNode(new AST("Terminal", ";")); //necessary?
 			ast->addNode(ImportDeclaration());
 		}
 		else{ 
-			ast->addNode(new AST("ERROR", "Expected semicolon, found: " + getIdentifierValue()));
+			ast->addNode(new AST("ERROR", "Expected semicolon."));
 		}
-		return ast;
+		break;
 	default: 
+		backtrack();
 		delete ast;
 		return nullptr;
 	}
+	return ast;
 
 }
 
-AST* Parser::ImportPath(){
+AST* Parser::ImportPath(std::string id){
 	AST* ast = new AST("ImportPath");
 
 	//TODO: import path, cannot be empty -> error
@@ -82,6 +93,7 @@ AST* Parser::ImportPath(){
 }
 
 //TODO: change grammar so that MainFunc is a production of TopLevelDeclaration -> FuncDeclaration, change code accordingly
+//OR: switch case in other method (TLD -> return nullptr, go to mainfunc)
 AST* Parser::MainBody(){
 	AST* ast = new AST("MainBody");
 	ast->addNode(TopLevelDeclaration());
@@ -115,36 +127,38 @@ AST* Parser::MainFunc(){
 		if (gettok() == tok_main){
 			ast->addNode(new AST("Terminal", "main"));
 			if (gettok() == tok_lparen){
-				ast->addNode(new AST("Terminal", "("));
+				ast->addNode(new AST("Terminal", "(")); //necessary?
 				if (gettok() == tok_rparen){
-					ast->addNode(new AST("Terminal", ")"));
+					ast->addNode(new AST("Terminal", ")")); //necessary?
 					if (gettok() == tok_lcurly){
-						ast->addNode(new AST("Terminal", "{"));
+						ast->addNode(new AST("Terminal", "{")); //necessary?
 						ast->addNode(VoidFuncBody());
 						if (gettok() == tok_rcurly){
-							ast->addNode(new AST("Terminal", "}"));
+							ast->addNode(new AST("Terminal", "}")); //necessary?
 						}
 						else{
-							ast->addNode(new AST("ERROR", "Expected }, found: " + getIdentifierValue()));
+							ast->addNode(new AST("ERROR", "Expected }."));
 						}
 					}
 					else{
-						ast->addNode(new AST("ERROR", "Expected {, found: " + getIdentifierValue()));
+						ast->addNode(new AST("ERROR", "Expected {."));
 					}
 				}
 				else{
-					ast->addNode(new AST("ERROR", "Expected ), found: " + getIdentifierValue()));
+					ast->addNode(new AST("ERROR", "Expected )."));
 				}
 			}
 			else{
-				ast->addNode(new AST("ERROR", "Expected (, found: " + getIdentifierValue()));
+				ast->addNode(new AST("ERROR", "Expected (."));
 			}
 		}
 		else{
-			ast->addNode(new AST("ERROR", "Expected Identifier \"main\", found: " + getIdentifierValue()));
+			ast->addNode(new AST("ERROR", "Expected Identifier \"main\"."));
 		}
+		break;
 	default:
-		ast->addNode(new AST("ERROR", "Expected function declaration, found: " + getIdentifierValue()));
+		ast->addNode(new AST("ERROR", "Expected function declaration."));
+		break;
 	}
 	return ast;
 	

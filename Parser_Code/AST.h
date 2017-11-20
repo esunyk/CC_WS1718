@@ -5,9 +5,10 @@
 #include <vector>
 
 enum Type {
-	S, SourceFile, PackageDeclarationRest, ImportDeclaration, MainBody, Body, 
-	TopLevelDeclaration, MainFunc, PackageIdentifier, VoidFuncBody, ImportPath, Terminal,
-	ERROR //for error handling, since epsilon productions are permissible and thus nullptr is not an error
+	SourceFile, PackageDeclarationRest, ImportDeclaration, MainBody, Body, 
+	TopLevelDeclaration, MainFunc, PackageIdentifier, VoidFuncBody, ImportPath, S,
+	ERROR, //for error handling, since epsilon productions are permissible and thus nullptr is not an error
+	Terminal
 };
 
 class AST {
