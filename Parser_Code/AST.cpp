@@ -27,14 +27,14 @@ const void AST::traverse() {
 	if (value != ""){
 		std::cout << " : " << value;
 
-}
+	}
 	std::cout << std::endl;
 
 	for (std::vector<AST*>::iterator it = nodes.begin(); it != nodes.end(); ++it) {
 		// TODO: structure output format
 		std::cout << "\t->";
 		if (*it != nullptr)
-		(*it)->traverse();
+			(*it)->traverse();
 	}
 }
 
@@ -120,5 +120,5 @@ const std::string AST::inttostr(const int r) {
 	std::cout << std::endl;
 	std::cin.get(); //pause for debugging purposes
 	return 0;
-}*/
+	}*/
 

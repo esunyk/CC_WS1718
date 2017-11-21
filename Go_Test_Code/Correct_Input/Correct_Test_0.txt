@@ -1,4 +1,7 @@
 package main;
 
+import "abc";
+import "def";
+
 func main() {
 }

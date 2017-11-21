@@ -1,36 +1,43 @@
 #include <iostream>
 #include <fstream>
 #include <string> 
-#include "stdio.h"
 #include <stdlib.h>
+#include <regex>
+#include "stdio.h"
 #include "Token.h"
+#include "Lexer.h"
 
 //TODO: regex for identifiers
+//TODO: include recursion from grammar
+//TODO: make these static class members
 static std::string IdentifierStr; 	// Filled in if tok_identifier
-static double NumVal;             	// Filled in if tok_number
-
 static std::string code;			//single line of code
 static int position = 0;			//position within the line
 static int savedPosition;
+static std::vector<std::string> codeVec;
 
-// TODO how to pass code to lexer?
-static void read(std::string input) {
+//TODO: enum for regex?
+static std::regex imp_id ("\"[[:alpha:]]+\"");
+static std::regex short_pid("[[:alpha:]]");
+static std::regex long_pid("[_[:alpha:]][[:alnum:]_]+");
+
+void Lexer::setCode(std::string input) {
 	code = input;
 }
 
-static void savePosition(){
+void Lexer::savePosition(){
 	savedPosition = position;
 }
 
-static void backtrack(){
+void Lexer::backtrack(){
 	position = savedPosition;
 }
 
-static std::string getIdentifierValue(){
+std::string Lexer::getIdentifierStr(){
 	return IdentifierStr;
 }
 
-static int gettok() {
+int Lexer::gettok() {
 	if (position == code.length()){
 		return tok_eof;
 	}
@@ -53,33 +60,19 @@ static int gettok() {
 		}
 
 		if (IdentifierStr == "package"){
-				return tok_package;
+			return tok_package;
 		}
 		if (IdentifierStr == "func"){
 			return tok_func;
 		}
 		if (IdentifierStr == "import"){
-				return tok_imp;
+			return tok_imp;
 		}
 		if (IdentifierStr == "var"){
 			return tok_var;
 		}
-			return tok_id;
-		
-	}
+		return tok_id;
 
-	// Number: [0-9.]+
-	if (isdigit(LastChar)) {
-		bool isDecimal;
-		std::string NumStr;
-		do {
-			NumStr += LastChar;
-			LastChar = code[++position];
-		} while (isdigit(LastChar) || LastChar == '.');
-
-		NumVal = strtod(NumStr.c_str(), NULL);
-
-		return tok_number;
 	}
 
 	int tokCode;

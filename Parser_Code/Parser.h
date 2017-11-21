@@ -9,8 +9,6 @@ public:
 	static AST* startParsing(std::vector<std::string>);
 
 private:
-	static int lookahead;
-
 	static AST* SourceFile();
 	static AST* PackageDeclarationRest();
 	static AST* ImportDeclaration();

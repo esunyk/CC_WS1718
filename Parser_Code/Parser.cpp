@@ -1,12 +1,17 @@
 #include "Parser.h"
-#include "Lexer.cpp"
+#include "Lexer.h"
+#include "Token.h"
+
+//TODO: throw exception, error handling instead of error type
+//TODO: regression testing -> no framework, automated in main
+//TODO: symbol table
 
 AST* Parser::startParsing(std::vector<std::string> input){
 	std::string entirecode = "";
 	for (std::string loc : input){
 		entirecode += loc;
 	}
-	read(entirecode);
+	Lexer::setCode(entirecode);
 	AST* s_ast = new AST("S");
 	s_ast->addNode(SourceFile());
 	return s_ast;
@@ -14,7 +19,7 @@ AST* Parser::startParsing(std::vector<std::string> input){
 
 AST* Parser::SourceFile(){
 	AST* ast = new AST("SourceFile");
-	switch (gettok()){
+	switch (Lexer::gettok()){
 	case tok_package:
 		ast->addNode(new AST("Terminal", "package"));
 		ast->addNode(PackageDeclarationRest());
@@ -28,10 +33,10 @@ AST* Parser::SourceFile(){
 
 AST* Parser::PackageDeclarationRest(){
 	AST* ast = new AST("PackageDeclarationRest");
-	switch (gettok()){
+	switch (Lexer::gettok()){
 	case tok_main:
 		ast->addNode(new AST("Terminal", "main"));
-		if (gettok() == tok_semicolon){
+		if (Lexer::gettok() == tok_semicolon){
 			ast->addNode(new AST("Terminal", ";")); //necessary?
 			ast->addNode(ImportDeclaration());
 			ast->addNode(MainBody());
@@ -40,10 +45,10 @@ AST* Parser::PackageDeclarationRest(){
 			ast->addNode(new AST("ERROR", "Expected semicolon."));
 		}
 		break;
+		//TODO: include pid
 	case tok_pid:
-		//TODO: lexer header to remove global variables?
-		ast->addNode(PackageIdentifier(getIdentifierValue()));
-		if (gettok() == tok_semicolon){
+		ast->addNode(PackageIdentifier(Lexer::getIdentifierStr()));
+		if (Lexer::gettok() == tok_semicolon){
 			ast->addNode(new AST("Terminal", ";")); //necessary?
 			ast->addNode(ImportDeclaration());
 			ast->addNode(Body());
@@ -62,20 +67,20 @@ AST* Parser::PackageDeclarationRest(){
 
 AST* Parser::ImportDeclaration(){
 	AST* ast = new AST("ImportDeclaration");
-	savePosition();
-	switch (gettok()){
+	Lexer::savePosition();
+	switch (Lexer::gettok()){
 	case tok_imp:
-		ImportPath(getIdentifierValue());
-		if (gettok() == tok_semicolon){
+		ImportPath(Lexer::getIdentifierStr());
+		if (Lexer::gettok() == tok_semicolon){
 			ast->addNode(new AST("Terminal", ";")); //necessary?
 			ast->addNode(ImportDeclaration());
 		}
-		else{ 
+		else{
 			ast->addNode(new AST("ERROR", "Expected semicolon."));
 		}
 		break;
-	default: 
-		backtrack();
+	default:
+		Lexer::backtrack();
 		delete ast;
 		return nullptr;
 	}
@@ -121,19 +126,19 @@ AST* Parser::TopLevelDeclaration(){
 
 AST* Parser::MainFunc(){
 	AST* ast = new AST("MainFunc");
-	switch (gettok()){
+	switch (Lexer::gettok()){
 	case tok_func:
 		ast->addNode(new AST("Terminal", "func"));
-		if (gettok() == tok_main){
+		if (Lexer::gettok() == tok_main){
 			ast->addNode(new AST("Terminal", "main"));
-			if (gettok() == tok_lparen){
+			if (Lexer::gettok() == tok_lparen){
 				ast->addNode(new AST("Terminal", "(")); //necessary?
-				if (gettok() == tok_rparen){
+				if (Lexer::gettok() == tok_rparen){
 					ast->addNode(new AST("Terminal", ")")); //necessary?
-					if (gettok() == tok_lcurly){
+					if (Lexer::gettok() == tok_lcurly){
 						ast->addNode(new AST("Terminal", "{")); //necessary?
 						ast->addNode(VoidFuncBody());
-						if (gettok() == tok_rcurly){
+						if (Lexer::gettok() == tok_rcurly){
 							ast->addNode(new AST("Terminal", "}")); //necessary?
 						}
 						else{
@@ -161,7 +166,7 @@ AST* Parser::MainFunc(){
 		break;
 	}
 	return ast;
-	
+
 
 }
 

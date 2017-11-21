@@ -5,7 +5,7 @@
 #include <vector>
 
 enum Type {
-	SourceFile, PackageDeclarationRest, ImportDeclaration, MainBody, Body, 
+	SourceFile, PackageDeclarationRest, ImportDeclaration, MainBody, Body,
 	TopLevelDeclaration, MainFunc, PackageIdentifier, VoidFuncBody, ImportPath, S,
 	ERROR, //for error handling, since epsilon productions are permissible and thus nullptr is not an error
 	Terminal
