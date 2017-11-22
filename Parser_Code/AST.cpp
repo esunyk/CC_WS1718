@@ -22,19 +22,23 @@ void AST::addNode(AST* node) {
 	nodes.push_back(node);
 }
 
-const void AST::traverse() {
-	std::cout << inttostr(token);
+const void AST::traverse(std::ostream& output, int depth) {
+	for (int i = 0; i <= depth; i++){
+		output << "    ";
+	}
+	depth++;
+	output << inttostr(token);
 	if (value != ""){
-		std::cout << " : " << value;
+		output << " : " << value;
 
 	}
-	std::cout << std::endl;
-
+	else{ output << "->"; }
+	output << std::endl;
 	for (std::vector<AST*>::iterator it = nodes.begin(); it != nodes.end(); ++it) {
 		// TODO: structure output format
-		std::cout << "\t->";
+		//output << "\t";
 		if (*it != nullptr)
-			(*it)->traverse();
+			(*it)->traverse(output, depth);
 	}
 }
 

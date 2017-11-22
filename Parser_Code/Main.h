@@ -3,8 +3,8 @@
 class Main{
 public:
 	static std::vector<std::string> takeInput();
-	static std::vector<std::string> readFile(std::string);
-	static void handleCode(std::vector<std::string>);
+	static bool readFile(std::string, std::vector<std::string>*);
+	static void handleCode(std::vector<std::string>, std::ostream&);
 	static void userMenu();
 private:
 };

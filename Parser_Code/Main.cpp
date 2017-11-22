@@ -15,51 +15,61 @@ std::vector<std::string> Main::takeInput() {
 	do {
 		std::cout << i++ << " ";
 		getline(std::cin, loc);
-		if (loc != "#"){
+		if (loc != "#" && loc != ""){ //do not save empty strings
 			code.push_back(loc);
 		}
 	} while (loc[0] != '#');
 	return code;
 }
 
-std::vector<std::string> Main::readFile(std::string filename){
+bool Main::readFile(std::string filename, std::vector<std::string>* code){
 	std::ifstream file;
 	file.open(filename);
 	// do something 
 	std::string loc;
-	std::vector<std::string> code;
 	if (file.is_open()) {
 
 		while (!file.eof()) {
 
 			getline(file, loc);
-			code.push_back(loc);
+			if (loc != ""){
+				code->push_back(loc);
+			}
 		}
-
+		file.close();
+		return true;
 	}
-	file.close();
-	return code;
+	return false;
 }
 
-void Main::handleCode(std::vector<std::string> code){
+void Main::handleCode(std::vector<std::string> code, std::ostream &output){
 	AST* finalTree = Parser::startParsing(code);
-	finalTree->traverse();
+	finalTree->traverse(output, 0);
 	delete finalTree;
 }
 
 void Main::userMenu(){
 	std::vector<std::string> code;
 	std::string filename;
-	int input;
 	std::string tmpInput;
+	std::string directory;
+	std::string tmpFilename;
+	std::string outFileName;
 	bool validInput;
+	bool fileAvailable;
+	bool fileNameAvailable;
+	std::ofstream outFile;
+	std::ifstream testFileName;
+	int input;
+	int i = 0;
+	int j = 0;
 	do{
 		validInput = false;
 		std::cout << "Options: " << std::endl;
 		std::cout << "Enter go code manually: 1" << std::endl;
 		std::cout << "Read go code from file: 2" << std::endl;
 		std::cout << "Run all test files and output results to a text document: 3" << std::endl;
-		std::cout << "Terminate Program: 3" << std::endl;
+		std::cout << "Terminate Program: 4" << std::endl;
 
 		while (!validInput){
 		getline(std::cin, tmpInput);
@@ -78,18 +88,69 @@ void Main::userMenu(){
 		switch (input){
 		case 1:
 			code = Main::takeInput();
-			Main::handleCode(code);
+			Main::handleCode(code, std::cout);
 			break;
 		case 2:
-			std::cout << "Enter file name: " << std::endl;
+			std::cout << "Enter an absolute or relative filepath: " << std::endl;
 			getline(std::cin, filename);
-			code = Main::readFile(filename);
-			Main::handleCode(code);
+			Main::readFile(filename, &code);
+			Main::handleCode(code, std::cout);
 			break;
 		case 3:
-			//TODO: automated testing:
-			//go to folders, increment file ending number, run while file is openable
-			//create output file -> date, output
+			fileAvailable = false;
+			std::cout << "Enter an absolute or relative path to the directory";
+			std::cout << " where you have stored the \"Correct_Input\" and \"Incorrect_Input\" folders." << std::endl;
+			std::cout << "There should also be a \"Test_Output\" folder in the same directory." << std::endl;
+			getline(std::cin, directory);
+			filename = directory;
+			//open test log
+			do{
+				outFileName = directory + "/Test_Output/Test_Log_";
+				outFileName = outFileName + std::to_string(j) + ".txt";
+				j++;
+				testFileName.open(outFileName);
+				fileNameAvailable = !testFileName.good(); //ifstream.good checks if a file exists
+				if (fileNameAvailable){
+					outFile.open(outFileName);
+				}
+			} while (!fileNameAvailable);
+			testFileName.close();
+			//correct tests
+			filename += "/Correct_Input/Correct_Test_";
+			tmpFilename = filename;
+			outFile << "Testing correct input:" << std::endl << std::endl;
+			do{
+				filename = filename + std::to_string(i) + ".txt";
+				fileAvailable = Main::readFile(filename, &code);
+				if (fileAvailable){
+					outFile << "Correct test number " << std::to_string(i) << ":"<< std::endl;
+					Main::handleCode(code, outFile);
+					i++;
+					filename = tmpFilename;
+					outFile << std::endl;
+					code.clear(); //make room for new code
+				}
+			} while (fileAvailable);
+
+			//incorrect tests
+			i = 0;
+			filename = directory;
+			filename += "/Incorrect_Input/Incorrect_Test_";
+			tmpFilename = filename;
+			outFile << "Testing incorrect input:" << std::endl << std::endl;
+			do{
+				filename = filename + std::to_string(i) + ".txt";
+				fileAvailable = Main::readFile(filename, &code);
+				if (fileAvailable){
+					outFile << "Incorrect test number " << std::to_string(i) << ":" << std::endl;
+					Main::handleCode(code, outFile);
+					i++;
+					filename = tmpFilename;
+					outFile << std::endl;
+					code.clear(); //make room for new code
+				}
+			} while (fileAvailable);
+			outFile.close();
 			//manually archive old output files
 			break;
 		case 4:
@@ -102,37 +163,6 @@ void Main::userMenu(){
 }
 
 int main(int argc, char** argv) {
-
-	// check for arguments, if not switch to user menu
-	if (argc > 1) {
-		// vector of inputs?
-		std::vector<char*> input;
-		std::cout << "hi";
-		try {
-			// argv[0]: program name
-			for (int i = 0; i < argc; i++) {
-
-				// check format etc
-				//	std::cout << argv[i] << std::endl; 
-
-				// add to queue  
-				input.push_back(argv[i]);
-			}
-			for (unsigned int i = 1; i < input.size(); i++) {
-				std::string filename(input.at(i));
-				std::vector<std::string> code = Main::readFile(filename);
-				Main::handleCode(code);
-
-			}
-
-		}
-		catch (const std::exception&) {
-		}
-	}
-	else {
-		Main::userMenu();
-	}
-
-	std::cin.get(); //pause for debugging purposes
+	Main::userMenu();
 	return 0;
 }

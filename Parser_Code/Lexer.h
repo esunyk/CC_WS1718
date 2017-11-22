@@ -7,7 +7,12 @@ public:
 	static void backtrack();
 	static int gettok();
 	static std::string getIdentifierStr();
-	static void setCode(std::string);
+	static void setCode(std::vector<std::string>);
+	static int getLinecount();
+	static int getPosition();
+	static void resetLinecount();
+	static void resetPosition();
+	static void resetSavedPosition();
 
 private:
 

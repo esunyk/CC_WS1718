@@ -7,29 +7,47 @@
 #include "Token.h"
 #include "Lexer.h"
 
-//TODO: regex for identifiers
 //TODO: include recursion from grammar
-//TODO: make these static class members
 static std::string IdentifierStr; 	// Filled in if tok_identifier
 static std::string code;			//single line of code
 static int position = 0;			//position within the line
-static int savedPosition;
+static int linecount = 1;			//which line is currently being processed
+static int savedPosition = 0;
 static std::vector<std::string> codeVec;
 
 //TODO: enum for regex?
-static std::regex imp_id ("\"[[:alpha:]]+\"");
-static std::regex short_pid("[[:alpha:]]");
+static std::regex letter("[[:alpha:]]");
+static std::regex alnum_string ("\"[[:alnum:]]+\"");
 static std::regex long_pid("[_[:alpha:]][[:alnum:]_]+");
 
-void Lexer::setCode(std::string input) {
-	code = input;
+void Lexer::setCode(std::vector<std::string> input) {
+	codeVec = input;
 }
 
+void Lexer::resetLinecount(){
+	linecount = 1;
+}
+void Lexer::resetPosition(){
+	position = 0;
+}
+
+void Lexer::resetSavedPosition(){
+	savedPosition = 0;
+}
+int Lexer::getLinecount(){
+	return linecount;
+}
+
+int Lexer::getPosition(){
+	return position;
+}
 void Lexer::savePosition(){
+	//TODO: save line? -> play through possible scenario
 	savedPosition = position;
 }
 
 void Lexer::backtrack(){
+	//TODO: restore line? -> play through possible scenario
 	position = savedPosition;
 }
 
@@ -38,8 +56,15 @@ std::string Lexer::getIdentifierStr(){
 }
 
 int Lexer::gettok() {
-	if (position == code.length()){
+	code = codeVec.at(linecount-1);
+	if (position == code.length() && linecount == codeVec.size()){
 		return tok_eof;
+	}
+	else if(position >= code.length() || code == ""){
+		linecount++;
+		code = codeVec.at(linecount - 1);
+		position = 0;
+		savedPosition = 0;
 	}
 	static char LastChar = ' ';
 	LastChar = code[position];
@@ -47,7 +72,19 @@ int Lexer::gettok() {
 		// read from input
 		LastChar = code[++position];
 	}
-
+	if (LastChar == '"'){
+		IdentifierStr = LastChar;
+		while ((LastChar = code[++position]) != '"'){
+			IdentifierStr += LastChar;
+			if (position == code.length()){
+				//todo: ERROR: unterminated string
+			}
+		}
+		IdentifierStr += code[position++];
+		if (std::regex_match(IdentifierStr, alnum_string)){
+			return tok_string;
+		}
+	}
 	if (isalpha(LastChar) || LastChar == '_') {
 		IdentifierStr = LastChar;
 
@@ -98,14 +135,12 @@ int Lexer::gettok() {
 		tokCode = tok_semicolon;
 		break;
 	case EOF:
-		//don't eat eof
 		tokCode = tok_eof;
 		break;
 	default:
 		//return ascii value of char
 		//TODO: ERROR
 		int ThisChar = LastChar;
-		LastChar = code[++position];
 		tokCode = ThisChar;
 		break;
 

@@ -20,7 +20,8 @@ enum Token {
 	tok_func = -12,		// func
 	tok_imp = -13,		// import
 	tok_var = -14,		// var
-	tok_lcomment = -15  // //comment
+	tok_lcomment = -15,  // //comment
+	tok_string = -16     //proto-string
 };
 
 #endif

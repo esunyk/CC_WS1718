@@ -3,18 +3,27 @@
 #include "Token.h"
 
 //TODO: throw exception, error handling instead of error type
-//TODO: regression testing -> no framework, automated in main
 //TODO: symbol table
 
+std::string Parser::errorLocation;
+std::string Parser::errorMessage;
+
 AST* Parser::startParsing(std::vector<std::string> input){
-	std::string entirecode = "";
-	for (std::string loc : input){
-		entirecode += loc;
-	}
-	Lexer::setCode(entirecode);
+	//TODO: separate function to update location, otherwise: line 1, position 0
+	Lexer::setCode(input);
 	AST* s_ast = new AST("S");
 	s_ast->addNode(SourceFile());
+	Lexer::resetPosition();
+	Lexer::resetLinecount();
 	return s_ast;
+}
+
+AST* Parser::addErrorNode(std::string message){
+	Parser::errorLocation = "\nLine: " + std::to_string(Lexer::getLinecount()) + '\n' +
+		+"Position: " + std::to_string(Lexer::getPosition()) + '\n';
+	Parser::errorMessage = Parser::errorLocation + message;
+	AST* ast = new AST("ERROR", Parser::errorMessage);
+	return ast;
 }
 
 AST* Parser::SourceFile(){
@@ -25,7 +34,7 @@ AST* Parser::SourceFile(){
 		ast->addNode(PackageDeclarationRest());
 		break;
 	default:
-		ast->addNode(new AST("ERROR", "Expected package declaration."));
+		ast->addNode(Parser::addErrorNode("Expected package declaration."));
 		break;
 	}
 	return ast;
@@ -42,10 +51,10 @@ AST* Parser::PackageDeclarationRest(){
 			ast->addNode(MainBody());
 		}
 		else{
-			ast->addNode(new AST("ERROR", "Expected semicolon."));
+			ast->addNode(Parser::addErrorNode("Expected semicolon."));
 		}
 		break;
-		//TODO: include pid
+		//TODO: include pid for proper error message
 	case tok_pid:
 		ast->addNode(PackageIdentifier(Lexer::getIdentifierStr()));
 		if (Lexer::gettok() == tok_semicolon){
@@ -54,11 +63,11 @@ AST* Parser::PackageDeclarationRest(){
 			ast->addNode(Body());
 		}
 		else{
-			ast->addNode(new AST("ERROR", "Expected semicolon."));
+			ast->addNode(Parser::addErrorNode("Expected semicolon."));
 		}
 		break;
 	default:
-		ast->addNode(new AST("ERROR", "Expected package identifier."));
+		ast->addNode(Parser::addErrorNode("Expected package identifier."));
 		break;
 	}
 	return ast;
@@ -70,13 +79,13 @@ AST* Parser::ImportDeclaration(){
 	Lexer::savePosition();
 	switch (Lexer::gettok()){
 	case tok_imp:
-		ImportPath(Lexer::getIdentifierStr());
+		ast->addNode(ImportPath());
 		if (Lexer::gettok() == tok_semicolon){
 			ast->addNode(new AST("Terminal", ";")); //necessary?
 			ast->addNode(ImportDeclaration());
 		}
 		else{
-			ast->addNode(new AST("ERROR", "Expected semicolon."));
+			ast->addNode(Parser::addErrorNode("Expected semicolon."));
 		}
 		break;
 	default:
@@ -88,21 +97,24 @@ AST* Parser::ImportDeclaration(){
 
 }
 
-AST* Parser::ImportPath(std::string id){
+AST* Parser::ImportPath(){
 	AST* ast = new AST("ImportPath");
-
-	//TODO: import path, cannot be empty -> error
-	delete ast;
-	return nullptr;
-
+	switch (Lexer::gettok()){
+	case tok_string:
+		ast->addNode(new AST("Terminal", Lexer::getIdentifierStr()));
+		break;
+	default:
+		//TODO: error handling
+		ast->addNode(Parser::addErrorNode("Expected import path."));
+		break;
+	}
+	return ast;
 }
 
-//TODO: change grammar so that MainFunc is a production of TopLevelDeclaration -> FuncDeclaration, change code accordingly
-//OR: switch case in other method (TLD -> return nullptr, go to mainfunc)
 AST* Parser::MainBody(){
 	AST* ast = new AST("MainBody");
 	ast->addNode(TopLevelDeclaration());
-	ast->addNode(MainFunc()); //should be called from TLD
+	ast->addNode(MainFunc());
 	ast->addNode(TopLevelDeclaration());
 	return ast;
 
@@ -142,27 +154,27 @@ AST* Parser::MainFunc(){
 							ast->addNode(new AST("Terminal", "}")); //necessary?
 						}
 						else{
-							ast->addNode(new AST("ERROR", "Expected }."));
+							ast->addNode(Parser::addErrorNode("Expected }"));
 						}
 					}
 					else{
-						ast->addNode(new AST("ERROR", "Expected {."));
+						ast->addNode(Parser::addErrorNode("Expected {"));
 					}
 				}
 				else{
-					ast->addNode(new AST("ERROR", "Expected )."));
+					ast->addNode(Parser::addErrorNode("Expected )"));
 				}
 			}
 			else{
-				ast->addNode(new AST("ERROR", "Expected (."));
+				ast->addNode(Parser::addErrorNode("Expected ("));
 			}
 		}
 		else{
-			ast->addNode(new AST("ERROR", "Expected Identifier \"main\"."));
+			ast->addNode(Parser::addErrorNode("Expected Identifier \"main\""));
 		}
 		break;
 	default:
-		ast->addNode(new AST("ERROR", "Expected function declaration."));
+		ast->addNode(Parser::addErrorNode("Expected function declaration."));
 		break;
 	}
 	return ast;
