@@ -13,9 +13,6 @@ public:
 	static void resetLinecount();
 	static void resetPosition();
 	static void resetSavedPosition();
-
-private:
-
 };
 
 #endif // !LEXER_H

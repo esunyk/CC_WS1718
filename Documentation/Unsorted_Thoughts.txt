@@ -16,7 +16,5 @@ problems encountered:
 -start at root or with something simple -> both, leave complicated things for later but create structure
 -productions: all alternatives at once or everything simple? -> all at once for better productions
 -how much at once? -> not more than 3, 4 new things 
-
-unsolved questions:
--entry point "main" function: syntactic or semantic?
+-entry point "main" function: syntactic or semantic? -> can be syntactic, easier to handle semantically (grammar not changed to reflect it yet)
 -at least one function among TLD: syntactic or semantic?

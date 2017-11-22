@@ -23,6 +23,7 @@ Correct test number 0:
                         Terminal : )
                         Terminal : {
                         Terminal : }
+Symbol tables: 
 Name: main
 Scope: global
 Is a function: Yes
@@ -43,6 +44,7 @@ Correct test number 1:
                         Terminal : )
                         Terminal : {
                         Terminal : }
+Symbol tables: 
 Name: main
 Scope: global
 Is a function: Yes
@@ -54,7 +56,7 @@ Incorrect test number 0:
 ERROR: 
 Line: 2
 Position: 4
-Expected function declaration.
+Expected import or top level declaration.
 
 Incorrect test number 1:
 ERROR: 
@@ -84,7 +86,7 @@ Incorrect test number 5:
 ERROR: 
 Line: 1
 Position: 13
-Expected function declaration.
+Expected import or top level declaration.
 
 Incorrect test number 6:
 ERROR: 
@@ -103,4 +105,20 @@ ERROR:
 Line: 1
 Position: 17
 Expected package declaration.
+
+Incorrect test number 9:
+Error: unterminated String in line 2
+
+Incorrect test number 10:
+ERROR: 
+Line: 2
+Position: 6
+Expected import path.
+
+Incorrect test number 11:
+ERROR: 
+Line: 1
+Position: 8
+Invalid package identifer.
+Package identifiers must start with a letter or an underscore (if the length is bigger than 1) and can only contain letters, numbers and underscores.
 

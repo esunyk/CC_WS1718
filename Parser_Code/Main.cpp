@@ -6,6 +6,7 @@
 #include <iostream>
 #include <cstring>
 #include <fstream>
+#include <sys/stat.h> //to chack for available file names
 
 //TODO: test with test files -> works as intended, now:
 //TODO: automated testing
@@ -47,10 +48,11 @@ bool Main::readFile(std::string filename, std::vector<std::string>* code){
 void Main::handleCode(std::vector<std::string> code, std::ostream &output){
 	AST* finalTree = nullptr;
 	try{
-	finalTree = Parser::startParsing(code);
-	finalTree->traverse(output, 0);
-	finalTree->printSymbolTable(output);
-	delete finalTree;
+		finalTree = Parser::startParsing(code);
+		finalTree->traverse(output, 0);
+		output << "Symbol tables: " << std::endl;
+		finalTree->printSymbolTable(output);
+		delete finalTree;
 	}
 	catch (ParseException &ex){
 		output << ex.what() << std::endl;
@@ -84,17 +86,17 @@ void Main::userMenu(){
 		std::cout << "Terminate Program: 4" << std::endl;
 
 		while (!validInput){
-		getline(std::cin, tmpInput);
-		try{
-			input = std::stoi(tmpInput);
-			validInput = true;
-		}
-		catch (std::invalid_argument){ //conversion failed
-			std::cout << "Please enter a number." << std::endl;
-		}
-		catch (std::out_of_range){ //number to big, error from underlying function
-			std::cout << "The number you entered is too big, please enter another number." << std::endl;
-		}
+			getline(std::cin, tmpInput);
+			try{
+				input = std::stoi(tmpInput);
+				validInput = true;
+			}
+			catch (std::invalid_argument){ //conversion failed
+				std::cout << "Please enter a number." << std::endl;
+			}
+			catch (std::out_of_range){ //number to big, error from underlying function
+				std::cout << "The number you entered is too big, please enter another number." << std::endl;
+			}
 		}
 
 		switch (input){
@@ -115,7 +117,10 @@ void Main::userMenu(){
 			std::cout << "There should also be a \"Test_Output\" folder in the same directory." << std::endl;
 			getline(std::cin, directory);
 			filename = directory;
-			//open test log
+
+			//the commented code fails after once successful iteration, for undetermined reasons, good() returns false even if file exists
+			//use the sys/stat.h code below that instead or manage old test log files manually
+			/*
 			do{
 				outFileName = directory + "/Test_Output/Test_Log_";
 				outFileName = outFileName + std::to_string(j) + ".txt";
@@ -125,8 +130,19 @@ void Main::userMenu(){
 				if (fileNameAvailable){
 					outFile.open(outFileName);
 				}
+			} while (!fileNameAvailable);*/
+
+			do{
+				outFileName = directory + "/Test_Output/Test_Log_";
+				outFileName = outFileName + std::to_string(j) + ".txt";
+				j++;
+				struct stat buf;
+				fileNameAvailable = ((stat(outFileName.c_str(), &buf) != -1) ? false : true);
+				if (fileNameAvailable){
+					outFile.open(outFileName);
+				}
 			} while (!fileNameAvailable);
-			testFileName.close();
+
 			//correct tests
 			filename += "/Correct_Input/Correct_Test_";
 			tmpFilename = filename;
@@ -135,7 +151,7 @@ void Main::userMenu(){
 				filename = filename + std::to_string(i) + ".txt";
 				fileAvailable = Main::readFile(filename, &code);
 				if (fileAvailable){
-					outFile << "Correct test number " << std::to_string(i) << ":"<< std::endl;
+					outFile << "Correct test number " << std::to_string(i) << ":" << std::endl;
 					Main::handleCode(code, outFile);
 					i++;
 					filename = tmpFilename;

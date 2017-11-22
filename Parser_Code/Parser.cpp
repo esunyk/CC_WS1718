@@ -67,7 +67,7 @@ AST* Parser::PackageDeclarationRest(AST* parent){
 		}
 		break;
 	default:
-		Parser::generateErrorMessage("Expected package identifier.");
+		Parser::generateErrorMessage("Invalid package identifer.\nPackage identifiers must start with a letter or an underscore (if the length is bigger than 1) and can only contain letters, numbers and underscores.");
 		throw ParseException(Parser::errorMessage);
 		break;
 	}
@@ -134,7 +134,7 @@ AST* Parser::TopLevelDeclaration(AST* parent){
 	AST* ast = new AST("TopLevelDeclaration", parent);
 
 	delete ast;
-	return nullptr; 
+	return nullptr;
 	//TODO: non-empty TLD
 	//symbol table entry in global table for each new symbol, exception throwing
 
@@ -148,7 +148,7 @@ AST* Parser::MainFunc(AST* parent){
 		if (Lexer::gettok() == tok_main){
 			ast->addNode(new AST("Terminal", "main", ast));
 			//add main func to global symbol table
-			SymbolTableEntry entry(true, "void", Lexer::getLinecount(), Lexer::getPosition()-4);
+			SymbolTableEntry entry(true, "void", Lexer::getLinecount(), Lexer::getPosition() - 4);
 			AST* symTabNode = Parser::lookForScopeNode(ast);
 			symTabNode->addSymTabEntry("main", entry);
 			if (Lexer::gettok() == tok_lparen){
@@ -173,7 +173,8 @@ AST* Parser::MainFunc(AST* parent){
 				}
 				else{
 					Parser::generateErrorMessage("Expected )");
-					throw ParseException(Parser::errorMessage);}
+					throw ParseException(Parser::errorMessage);
+				}
 			}
 			else{
 				Parser::generateErrorMessage("Expected (");
@@ -186,7 +187,7 @@ AST* Parser::MainFunc(AST* parent){
 		}
 		break;
 	default:
-		Parser::generateErrorMessage("Expected import or function declaration.");
+		Parser::generateErrorMessage("Expected import or top level declaration.");
 		throw ParseException(Parser::errorMessage);
 		break;
 	}

@@ -1,8 +1,7 @@
 #include "AST.h" 
 #include <iostream>
 
-//TODO (maybe): subclass for leaves?
-//TODO: deal with nullptr in vector -> remove?
+//TODO (maybe): subclass for leaves, i.e. tokens?
 AST::AST(const std::string type, AST* parent) {
 	token = static_cast<Type>(strtoint(type));
 	value = "";
@@ -58,7 +57,7 @@ const void AST::traverse(std::ostream& output, int depth) {
 
 const void AST::printSymbolTable(std::ostream& output){
 	for (auto const& entry : symbolTable){
-		output << "Name: " << entry.first <<std::endl; //key
+		output << "Name: " << entry.first << std::endl; //key
 		SymbolTableEntry e(entry.second);
 		output << "Scope: ";
 		if (this->token == SourceFile){
@@ -82,7 +81,7 @@ Type AST::getType(){
 
 // converts token string value to int value
 const int AST::strtoint(const std::string type) {
-	//TODO switch case with string hash instead
+	//TODO: switch case with string hash instead? -> only if there is time!
 	if (type == "SourceFile")
 		return 0;
 
@@ -115,14 +114,10 @@ const int AST::strtoint(const std::string type) {
 
 	if (type == "S")
 		return 10;
-
-	if (type == "ERROR")
-		return 11;
-
 	//add more here
 
 	if (type == "Terminal")
-		return 12;
+		return 11;
 }
 
 // converts token int value to string value
@@ -138,9 +133,8 @@ const std::string AST::inttostr(const int r) {
 	case  7: return "PackageIdentifier";
 	case  8: return "VoidFuncBody";
 	case  9: return "ImportPath";
-		// more cases to be added
 	case 10: return "S";
-	case 11: return "ERROR";
+		// more cases to be added
 	default: return "Terminal";
 	}
 }

@@ -8,7 +8,6 @@
 #include "Lexer.h"
 #include "ParseException.h"
 
-//TODO: include recursion from grammar
 static std::string IdentifierStr; 	// Filled in if tok_identifier
 static std::string code;			//single line of code
 static int position = 0;			//position within the line
@@ -16,9 +15,9 @@ static int linecount = 1;			//which line is currently being processed
 static int savedPosition = 0;
 static std::vector<std::string> codeVec;
 
-//TODO: enum for regex?
+//TODO: separate data structure for regex?
 static std::regex letter("[[:alpha:]]"); //same as isalpha, but works with strings
-static std::regex alnum_string ("\"[[:alnum:]]+\"");
+static std::regex alnum_string("\"[[:alnum:]]+\"");
 static std::regex long_pid("[_[:alpha:]][[:alnum:]_]+");
 
 void Lexer::setCode(std::vector<std::string> input) {
@@ -43,12 +42,12 @@ int Lexer::getPosition(){
 	return position;
 }
 void Lexer::savePosition(){
-	//TODO: save line? -> play through possible scenario
+	//TODO: save line? -> try to think of possible scenario where this is needed, not encountered yet
 	savedPosition = position;
 }
 
 void Lexer::backtrack(){
-	//TODO: restore line? -> play through possible scenario
+	//TODO: restore line? -> try to think of possible scenario where this is needed, not encountered yet
 	position = savedPosition;
 }
 
@@ -57,11 +56,11 @@ std::string Lexer::getIdentifierStr(){
 }
 
 int Lexer::gettok() {
-	code = codeVec.at(linecount-1);
+	code = codeVec.at(linecount - 1);
 	if (position == code.length() && linecount == codeVec.size()){
 		return tok_eof;
 	}
-	else if(position >= code.length() || code == ""){
+	else if (position >= code.length() || code == ""){
 		linecount++;
 		code = codeVec.at(linecount - 1);
 		position = 0;
@@ -78,7 +77,7 @@ int Lexer::gettok() {
 		while ((LastChar = code[++position]) != '"'){
 			IdentifierStr += LastChar;
 			if (position == code.length()){
-				std::string msg = "Error: unterminated String in line " + linecount;
+				std::string msg = "Error: unterminated String in line " + std::to_string(linecount);
 				throw ParseException(msg);
 			}
 		}
@@ -111,7 +110,7 @@ int Lexer::gettok() {
 			return tok_var;
 		}
 		if (std::regex_match(IdentifierStr, long_pid) || std::regex_match(IdentifierStr, letter)){
-			return tok_pid; //explicitly make sure that tok_pid is also accepted where tok_id is since {tok_pid} = {tok_id} \"_"
+			return tok_pid; //TODO: with bigger grammar: explicitly make sure that tok_pid is also accepted where tok_id is since {tok_pid} = {tok_id} \"_"
 		}
 
 		//_ is the empty identifier, can be written to but never read from
@@ -146,10 +145,13 @@ int Lexer::gettok() {
 		tokCode = tok_eof;
 		break;
 	default:
-		errormsg = "Error: undefined character " + LastChar;
-		errormsg += " in line " + linecount;
-		errormsg += " at position " + position;
-		throw ParseException(errormsg);
+		/*
+		errormsg = "Error: undefined character " + std::to_string(LastChar);
+		errormsg += " in line " + std::to_string(linecount);
+		errormsg += " at position " + std::to_string(position);
+		throw ParseException(errormsg);*/
+
+		tokCode = 99; //error because undefined, parser generates correct error message for code position
 		break;
 
 	}

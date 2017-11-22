@@ -1,6 +1,6 @@
 Date: 03.11.2017
 Version: 0
-Corresponding test files: Correct_Test_0, Incorrect_Test_0, Incorrect_Test_1, Incorrect_Test_2, Incorrect_Test_3, Incorrect_Test_4, Incorrect_Test_5
+Corresponding test files: Correct_Test_1, Incorrect_Test_0, Incorrect_Test_1, Incorrect_Test_2, Incorrect_Test_3, Incorrect_Test_4, Incorrect_Test_5
 Incorrect_Test_6, Incorrect_Test_7, Incorrect_Test_8
 Additons to Go subset:
 -package declaration
@@ -24,8 +24,15 @@ Version: 0.21
 Corrections:
 -improved regex (tokens)
 
+Date: 21.11.17
+Version: 0.3
+Corresponding test files:
+Correct_Test_0, Incorrect_Test_9, Incorrect_Test_10, Incorrect_Test_11
+Additions to Go subset: 
+-single import declarations, alphanumerical strings
+
 Date:
-Corresponding test files: Correct_Test_1, [INCORRECT TESTS TO BE ADDED]
+Corresponding test files: [TESTS TO BE ADDED]
 Additions to Go subset:
 -simple function declarations
 -variable declaration and assignment: short, long, static, dynamic, top-level, in-function

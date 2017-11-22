@@ -1,0 +1,5 @@
+package main;
+
+import "abc;
+
+func main(){}
