@@ -2,6 +2,7 @@
 #define PARSER_H
 
 #include "AST.h"
+#include "SymbolTableEntry.h"
 
 class Parser{
 
@@ -11,18 +12,19 @@ public:
 	static std::string errorMessage;
 
 private:
-	static AST* SourceFile();
-	static AST* PackageDeclarationRest();
-	static AST* ImportDeclaration();
-	static AST* ImportPath();
-	static AST* MainBody();
-	static AST* Body();
-	static AST* TopLevelDeclaration();
-	static AST* MainFunc();
-	static AST* PackageIdentifier(std::string);
-	static AST* VoidFuncBody();
+	static AST* SourceFile(AST* parent);
+	static AST* PackageDeclarationRest(AST* parent);
+	static AST* ImportDeclaration(AST* parent);
+	static AST* ImportPath(AST* parent);
+	static AST* MainBody(AST* parent);
+	static AST* Body(AST* parent);
+	static AST* TopLevelDeclaration(AST* parent);
+	static AST* MainFunc(AST* parent);
+	static AST* PackageIdentifier(std::string, AST* parent);
+	static AST* VoidFuncBody(AST* parent);
 
-	static AST* addErrorNode(std::string);
+	static void generateErrorMessage(std::string);
+	static AST* lookForScopeNode(AST*);
 };
 
 #endif

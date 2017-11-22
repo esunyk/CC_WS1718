@@ -1,6 +1,8 @@
 #include "AST.h"
+#include "Lexer.h"
 #include "Parser.h"
 #include "Main.h"
+#include "ParseException.h"
 #include <iostream>
 #include <cstring>
 #include <fstream>
@@ -43,9 +45,19 @@ bool Main::readFile(std::string filename, std::vector<std::string>* code){
 }
 
 void Main::handleCode(std::vector<std::string> code, std::ostream &output){
-	AST* finalTree = Parser::startParsing(code);
+	AST* finalTree = nullptr;
+	try{
+	finalTree = Parser::startParsing(code);
 	finalTree->traverse(output, 0);
+	finalTree->printSymbolTable(output);
 	delete finalTree;
+	}
+	catch (ParseException &ex){
+		output << ex.what() << std::endl;
+		delete finalTree;
+		Lexer::resetPosition();
+		Lexer::resetLinecount();
+	}
 }
 
 void Main::userMenu(){

@@ -3,19 +3,35 @@
 
 //TODO (maybe): subclass for leaves?
 //TODO: deal with nullptr in vector -> remove?
-AST::AST(const std::string type) {
+AST::AST(const std::string type, AST* parent) {
 	token = static_cast<Type>(strtoint(type));
 	value = "";
+	this->parent = parent;
 }
 
-AST::AST(const std::string type, const std::string val) {
+std::map<std::string, SymbolTableEntry>& AST::getSymbolTable(){
+	return symbolTable;
+}
+
+void AST::addSymTabEntry(std::string name, SymbolTableEntry sym){
+	symbolTable.insert(std::pair<std::string, SymbolTableEntry>(name, sym));
+}
+
+AST::AST(const std::string type, const std::string val, AST* parent) {
 	token = static_cast<Type>(strtoint(type));
 	value = val;
+	this->parent = parent;
 }
 
 AST::~AST() {
-	for (std::vector<AST*>::iterator it = nodes.begin(); it != nodes.end(); ++it)
-		delete *it;
+	for (AST* ast : nodes){
+		//symbol table entries are not created dynamically and don't need to be deleted manually
+		delete ast;
+	}
+}
+
+AST* AST::getParent(){
+	return this->parent;
 }
 
 void AST::addNode(AST* node) {
@@ -34,14 +50,35 @@ const void AST::traverse(std::ostream& output, int depth) {
 	}
 	else{ output << "->"; }
 	output << std::endl;
-	for (std::vector<AST*>::iterator it = nodes.begin(); it != nodes.end(); ++it) {
-		// TODO: structure output format
-		//output << "\t";
-		if (*it != nullptr)
-			(*it)->traverse(output, depth);
+	for (AST* ast : nodes){
+		if (ast != nullptr)
+			(ast)->traverse(output, depth);
 	}
 }
 
+const void AST::printSymbolTable(std::ostream& output){
+	for (auto const& entry : symbolTable){
+		output << "Name: " << entry.first <<std::endl; //key
+		SymbolTableEntry e(entry.second);
+		output << "Scope: ";
+		if (this->token == SourceFile){
+			output << "global" << std::endl;
+		}
+		//TODO with bigger grammar: create scope output for each node type the symbol table is stored at
+		output << "Is a function: ";
+		output << (e.isFunction() ? "Yes" : "No") << std::endl;
+		output << "Name declared on line " << e.getDecLine();
+		output << " , at position " << e.getDecPos() << std::endl;
+	}
+	for (AST* ast : nodes){
+		if (ast != nullptr)
+			(ast)->printSymbolTable(output);
+	}
+}
+
+Type AST::getType(){
+	return this->token;
+}
 
 // converts token string value to int value
 const int AST::strtoint(const std::string type) {

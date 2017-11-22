@@ -6,6 +6,7 @@
 #include "stdio.h"
 #include "Token.h"
 #include "Lexer.h"
+#include "ParseException.h"
 
 //TODO: include recursion from grammar
 static std::string IdentifierStr; 	// Filled in if tok_identifier
@@ -16,7 +17,7 @@ static int savedPosition = 0;
 static std::vector<std::string> codeVec;
 
 //TODO: enum for regex?
-static std::regex letter("[[:alpha:]]");
+static std::regex letter("[[:alpha:]]"); //same as isalpha, but works with strings
 static std::regex alnum_string ("\"[[:alnum:]]+\"");
 static std::regex long_pid("[_[:alpha:]][[:alnum:]_]+");
 
@@ -77,7 +78,8 @@ int Lexer::gettok() {
 		while ((LastChar = code[++position]) != '"'){
 			IdentifierStr += LastChar;
 			if (position == code.length()){
-				//todo: ERROR: unterminated string
+				std::string msg = "Error: unterminated String in line " + linecount;
+				throw ParseException(msg);
 			}
 		}
 		IdentifierStr += code[position++];
@@ -108,9 +110,15 @@ int Lexer::gettok() {
 		if (IdentifierStr == "var"){
 			return tok_var;
 		}
+		if (std::regex_match(IdentifierStr, long_pid) || std::regex_match(IdentifierStr, letter)){
+			return tok_pid; //explicitly make sure that tok_pid is also accepted where tok_id is since {tok_pid} = {tok_id} \"_"
+		}
+
+		//_ is the empty identifier, can be written to but never read from
 		return tok_id;
 
 	}
+	std::string errormsg;
 
 	int tokCode;
 	switch (LastChar){
@@ -138,10 +146,10 @@ int Lexer::gettok() {
 		tokCode = tok_eof;
 		break;
 	default:
-		//return ascii value of char
-		//TODO: ERROR
-		int ThisChar = LastChar;
-		tokCode = ThisChar;
+		errormsg = "Error: undefined character " + LastChar;
+		errormsg += " in line " + linecount;
+		errormsg += " at position " + position;
+		throw ParseException(errormsg);
 		break;
 
 	}
