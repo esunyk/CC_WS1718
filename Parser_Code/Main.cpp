@@ -50,7 +50,7 @@ void Main::handleCode(std::vector<std::string> code, std::ostream &output){
 	try{
 		finalTree = Parser::startParsing(code);
 		finalTree->traverse(output, 0);
-		output << "Symbol tables: " << std::endl;
+		output << "Symbol table entries: " << std::endl;
 		finalTree->printSymbolTable(output);
 		delete finalTree;
 	}

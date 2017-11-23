@@ -77,7 +77,7 @@ int Lexer::gettok() {
 		while ((LastChar = code[++position]) != '"'){
 			IdentifierStr += LastChar;
 			if (position == code.length()){
-				std::string msg = "Error: unterminated String in line " + std::to_string(linecount);
+				std::string msg = "ERROR: \nUnterminated String in line " + std::to_string(linecount) + ".";
 				throw ParseException(msg);
 			}
 		}

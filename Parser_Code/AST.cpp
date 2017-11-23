@@ -20,7 +20,7 @@ void AST::addSymTabEntry(std::string name, SymbolTableEntry sym){
 	//	throw ParseException("Error: duplicate declaration for import of " + name);
 	//}
 	if (symbolTable.find(name) != symbolTable.end()){
-		throw ParseException("Error: duplicate declaration for import of " + name);
+		throw ParseException("ERROR: \nDuplicate declaration for import of " + name + ".");
 	}
 	else{
 		symbolTable.insert(std::pair<std::string, SymbolTableEntry>(name, sym));
@@ -80,6 +80,7 @@ const void AST::printSymbolTable(std::ostream& output){
 		output << (e.isFunction() ? "Yes" : "No") << std::endl;
 		output << "Name declared on line " << e.getDecLine();
 		output << " , at position " << e.getDecPos() << std::endl;
+		output << std::endl;
 	}
 	for (AST* ast : nodes){
 		if (ast != nullptr)

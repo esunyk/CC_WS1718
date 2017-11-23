@@ -125,7 +125,7 @@ AST* Parser::ImportPath(AST* parent){
 		//map.insert returns pair, pair.second is false if key already exists
 		break;
 	default:
-		Parser::generateErrorMessage("Expected import path.");
+		Parser::generateErrorMessage("Expected import path. \n Import paths should be alphanumerical string literals."); //TODO: change message for bigger grammar
 		throw ParseException(Parser::errorMessage);
 		break;
 	}
@@ -220,7 +220,7 @@ AST* Parser::PackageIdentifier(std::string id, AST* parent){
 	ast->addNode(new AST("Terminal", id, ast));
 	SymbolTableEntry entry(false, "package", Lexer::getLinecount(), Lexer::getPosition() - id.length());
 	//no need to search for scope node, can only be located at one position in the hierarchy
-	ast->getParent()->getParent()->addSymTabEntry("id", entry);
+	ast->getParent()->addSymTabEntry(id, entry);
 	return ast;
 
 }

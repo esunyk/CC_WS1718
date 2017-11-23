@@ -1,0 +1,158 @@
+Testing correct input:
+
+Correct test number 0:
+    S->
+        SourceFile->
+            Terminal : package
+            PackageDeclarationRest->
+                Terminal : main
+                Terminal : ;
+                ImportDeclaration->
+                    ImportPath->
+                        Terminal : "abc"
+                    Terminal : ;
+                    ImportDeclaration->
+                        ImportPath->
+                            Terminal : "def"
+                        Terminal : ;
+                MainBody->
+                    MainFunc->
+                        Terminal : func
+                        Terminal : main
+                        Terminal : (
+                        Terminal : )
+                        Terminal : {
+                        Terminal : }
+Symbol table entries: 
+Name: abc
+Scope: global
+Type: import
+Is a function: No
+Name declared on line 2 , at position 7
+
+Name: def
+Scope: global
+Type: import
+Is a function: No
+Name declared on line 3 , at position 7
+
+Name: main
+Scope: global
+Type: void
+Is a function: Yes
+Name declared on line 4 , at position 5
+
+Name: main
+Scope: global
+Type: package
+Is a function: No
+Name declared on line 1 , at position 9
+
+
+Correct test number 1:
+    S->
+        SourceFile->
+            Terminal : package
+            PackageDeclarationRest->
+                Terminal : main
+                Terminal : ;
+                MainBody->
+                    MainFunc->
+                        Terminal : func
+                        Terminal : main
+                        Terminal : (
+                        Terminal : )
+                        Terminal : {
+                        Terminal : }
+Symbol table entries: 
+Name: main
+Scope: global
+Type: void
+Is a function: Yes
+Name declared on line 2 , at position 5
+
+Name: main
+Scope: global
+Type: package
+Is a function: No
+Name declared on line 1 , at position 9
+
+
+Testing incorrect input:
+
+Incorrect test number 0:
+ERROR: 
+Line: 2
+Position: 4
+Expected import or top level declaration.
+
+Incorrect test number 1:
+ERROR: 
+Line: 2
+Position: 10
+Expected (
+
+Incorrect test number 2:
+ERROR: 
+Line: 2
+Position: 12
+Expected )
+
+Incorrect test number 3:
+ERROR: 
+Line: 2
+Position: 11
+Expected (
+
+Incorrect test number 4:
+ERROR: 
+Line: 2
+Position: 4
+Expected semicolon.
+
+Incorrect test number 5:
+ERROR: 
+Line: 1
+Position: 13
+Expected import or top level declaration.
+
+Incorrect test number 6:
+ERROR: 
+Line: 3
+Position: 1
+Expected {
+
+Incorrect test number 7:
+ERROR: 
+Line: 2
+Position: 12
+Expected }
+
+Incorrect test number 8:
+ERROR: 
+Line: 1
+Position: 17
+Expected package declaration.
+
+Incorrect test number 9:
+ERROR: 
+Unterminated String in line 2.
+
+Incorrect test number 10:
+ERROR: 
+Line: 2
+Position: 6
+Expected import path. 
+ Import paths should be alphanumerical string literals.
+
+Incorrect test number 11:
+ERROR: 
+Line: 1
+Position: 8
+Invalid package identifer.
+Package identifiers must start with a letter or an underscore (if the length is bigger than 1) and can only contain letters, numbers and underscores.
+
+Incorrect test number 12:
+ERROR: 
+Duplicate declaration for import of abc.
+
