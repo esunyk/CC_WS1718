@@ -41,11 +41,17 @@ AST* Parser::SourceFile(AST* parent){
 
 AST* Parser::PackageDeclarationRest(AST* parent){
 	AST* ast = new AST("PackageDeclarationRest", parent);
+	SymbolTableEntry entry;
 	switch (Lexer::gettok()){
 	case tok_main:
 		ast->addNode(new AST("Terminal", "main", ast));
 		if (Lexer::gettok() == tok_semicolon){
 			ast->addNode(new AST("Terminal", ";", ast)); //necessary?
+			entry.setFunction(false);
+			entry.setDecLine(Lexer::getLinecount());
+			entry.setDecPos(Lexer::getPosition() - 4);
+			entry.setType("package");
+			ast->addSymTabEntry("main", entry);
 			ast->addNode(ImportDeclaration(ast));
 			ast->addNode(MainBody(ast));
 		}
@@ -91,6 +97,7 @@ AST* Parser::ImportDeclaration(AST* parent){ //symbols: defined in imported docu
 		}
 		break;
 	default:
+		//TODO: edit grammar to remove backtracking necessity -> move first token to previous production
 		Lexer::backtrack();
 		delete ast;
 		return nullptr;
@@ -101,9 +108,21 @@ AST* Parser::ImportDeclaration(AST* parent){ //symbols: defined in imported docu
 
 AST* Parser::ImportPath(AST* parent){
 	AST* ast = new AST("ImportPath", parent);
+	SymbolTableEntry entry(false, "", 0, 0);
+	AST* symTabNode;
+	std::string key; 
 	switch (Lexer::gettok()){
 	case tok_string:
 		ast->addNode(new AST("Terminal", Lexer::getIdentifierStr(), ast));
+		symTabNode = Parser::lookForScopeNode(ast, 0); //import scope is global
+		entry.setFunction(false);
+		entry.setDecLine(Lexer::getLinecount());
+		entry.setDecPos(Lexer::getPosition() - Lexer::getIdentifierStr().length());
+		entry.setType("import");
+		key = Lexer::getIdentifierStr().substr(1, Lexer::getIdentifierStr().length() - 2); //remove string delimiters
+		symTabNode->addSymTabEntry(key, entry);
+		//TODO: add symbol table entry, check for existing import -> parse error
+		//map.insert returns pair, pair.second is false if key already exists
 		break;
 	default:
 		Parser::generateErrorMessage("Expected import path.");
@@ -149,7 +168,7 @@ AST* Parser::MainFunc(AST* parent){
 			ast->addNode(new AST("Terminal", "main", ast));
 			//add main func to global symbol table
 			SymbolTableEntry entry(true, "void", Lexer::getLinecount(), Lexer::getPosition() - 4);
-			AST* symTabNode = Parser::lookForScopeNode(ast);
+			AST* symTabNode = Parser::lookForScopeNode(ast, 0);
 			symTabNode->addSymTabEntry("main", entry);
 			if (Lexer::gettok() == tok_lparen){
 				ast->addNode(new AST("Terminal", "(", ast)); //necessary?
@@ -199,6 +218,9 @@ AST* Parser::MainFunc(AST* parent){
 AST* Parser::PackageIdentifier(std::string id, AST* parent){
 	AST* ast = new AST("PackageDeclaration", parent);
 	ast->addNode(new AST("Terminal", id, ast));
+	SymbolTableEntry entry(false, "package", Lexer::getLinecount(), Lexer::getPosition() - id.length());
+	//no need to search for scope node, can only be located at one position in the hierarchy
+	ast->getParent()->getParent()->addSymTabEntry("id", entry);
 	return ast;
 
 }
@@ -211,9 +233,9 @@ AST* Parser::VoidFuncBody(AST* parent){
 
 }
 
-AST* Parser::lookForScopeNode(AST* ast){
+AST* Parser::lookForScopeNode(AST* ast, int type){
 	AST* symTabNode = ast->getParent();
-	while (symTabNode->getType() != 0){
+	while (symTabNode->getType() != type){
 		AST* tmpNode = symTabNode;
 		symTabNode = symTabNode->getParent();
 	}

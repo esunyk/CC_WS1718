@@ -24,7 +24,7 @@ private:
 	static AST* VoidFuncBody(AST* parent);
 
 	static void generateErrorMessage(std::string);
-	static AST* lookForScopeNode(AST*);
+	static AST* lookForScopeNode(AST*, int);
 };
 
 #endif

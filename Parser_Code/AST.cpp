@@ -1,4 +1,5 @@
 #include "AST.h" 
+#include "ParseException.h"
 #include <iostream>
 
 //TODO (maybe): subclass for leaves, i.e. tokens?
@@ -13,7 +14,17 @@ std::map<std::string, SymbolTableEntry>& AST::getSymbolTable(){
 }
 
 void AST::addSymTabEntry(std::string name, SymbolTableEntry sym){
-	symbolTable.insert(std::pair<std::string, SymbolTableEntry>(name, sym));
+	//std::pair<std::map<char, int>::iterator, bool> inserted;
+	//inserted = symbolTable.insert(std::pair<std::string, SymbolTableEntry>(name, sym));
+	//if (!inserted.second){
+	//	throw ParseException("Error: duplicate declaration for import of " + name);
+	//}
+	if (symbolTable.find(name) != symbolTable.end()){
+		throw ParseException("Error: duplicate declaration for import of " + name);
+	}
+	else{
+		symbolTable.insert(std::pair<std::string, SymbolTableEntry>(name, sym));
+	}
 }
 
 AST::AST(const std::string type, const std::string val, AST* parent) {
@@ -60,9 +71,10 @@ const void AST::printSymbolTable(std::ostream& output){
 		output << "Name: " << entry.first << std::endl; //key
 		SymbolTableEntry e(entry.second);
 		output << "Scope: ";
-		if (this->token == SourceFile){
+		if (this->token == SourceFile || token == PackageDeclarationRest){
 			output << "global" << std::endl;
 		}
+		output << "Type: " << e.getType() << std::endl;
 		//TODO with bigger grammar: create scope output for each node type the symbol table is stored at
 		output << "Is a function: ";
 		output << (e.isFunction() ? "Yes" : "No") << std::endl;

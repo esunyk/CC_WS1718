@@ -13,18 +13,27 @@ public:
 	// -> add to scope node's symbol table
 	//same process for top level declarations: start with tld node, iterate upwards through parents until source file node is reached
 	//shadowing is allowed (local variables can shadow imports, function arguments, ...) -> remember for later implementation
+	//the package declaration is located at the PackageDeclarationRest node
+
+	SymbolTableEntry(); //needed for switch cases
 	SymbolTableEntry(bool, std::string, int, int);
 	SymbolTableEntry(bool, std::string, int, int, SymbolTableEntry*);
 	~SymbolTableEntry();
+
 	bool isFunction();
 	int getDecLine();
 	int getDecPos();
 	std::string getType();
+
+	void setFunction(bool);
+	void setDecLine(int);
+	void setDecPos(int);
+	void setType(std::string);
 private:
 	bool function;
 	std::string type;
 	int decLine;
 	int decPos;
-	SymbolTableEntry* typeDecl = nullptr; //for complex types
+	SymbolTableEntry* typeDecl = nullptr; //declaration of type, for complex types
 };
 
