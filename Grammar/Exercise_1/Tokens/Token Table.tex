@@ -11,14 +11,14 @@
 \begin{document}
 \begin{table}[th]
 \centering
-\caption{Tokens in Go (As specified by the "Lexical Elements" section in Go spec) }
+\caption{Tokens in Go subset accepted by grammar}
 \label{tok_table}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}llllll@{}}
 \hline
  Token & Token Name & Token Class & Informal Description & Formal Description (regex) & Example(s) \\ \midrule
- Identifier & tok\_id & identifier & at least one char, alphanumeric with \_ & [\_a-zA-Z][\_a-zA-Z0-9]* & i, myId, \_abc, \_ var1 \\
-  Package Identifier & tok\_pid & identifier & at least one char, alphanumeric, cannot be blank identifier & [a-zA-Z] OR  [\_a-zA-Z][\_a-zA-Z0-9]+ & main, \_abc \\
+ Identifier & tok\_id & identifier & at least one char, starts with letter, alphanumeric with \_ & [\_a-zA-Z][\_a-zA-Z0-9]* & i, myId, \_abc, \_ var1 \\
+  Package Identifier & tok\_pid & identifier & at least one char, starts with letter, alphanumeric, cannot be blank identifier & [a-zA-Z] OR  [\_a-zA-Z][\_a-zA-Z0-9]+ & main, \_abc \\
  ( & tok\_lparen & punctuation & - & \textbackslash( & -  \\
  ) & tok\_rparen & punctuation & - & \textbackslash( & - \\
  \{ & tok\_lcurly & punctuation & - & \textbackslash \{ & - \\
@@ -29,8 +29,7 @@
  Function Declaration & tok\_func & reserved keyword & - & "func"  & - \\
  EOF & tok\_eof & reserved & - & "\textbackslash{Z}" & - \\
  Import & tok\_imp & reserved keyword & - & "import" & - \\
- Variable declaration & tok\_var & reserved keyword & - & "var" & - \\
- Line Comment & tok\_lcomment & Comment & // followed by anything until the end of line & //(.)*\$ & - \\
+ Alphanumeric string literal & tok\_string & string & numbers or letters delimited by " & \textbackslash "[a-zA-Z0-9]+\textbackslash " & "abc", "01234" \\
 \bottomrule
 \end{tabular}%
 }

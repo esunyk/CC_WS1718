@@ -8,7 +8,7 @@
 #include "Lexer.h"
 #include "ParseException.h"
 
-static std::string IdentifierStr; 	// Filled in if tok_identifier
+static std::string IdentifierStr; 	//Filled in if token longer than one char
 static std::string code;			//single line of code
 static int position = 0;			//position within the line
 static int linecount = 1;			//which line is currently being processed
@@ -41,6 +41,7 @@ int Lexer::getLinecount(){
 int Lexer::getPosition(){
 	return position;
 }
+
 void Lexer::savePosition(){
 	//TODO: save line? -> try to think of possible scenario where this is needed, not encountered yet
 	savedPosition = position;
