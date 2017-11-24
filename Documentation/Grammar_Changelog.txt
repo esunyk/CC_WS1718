@@ -29,13 +29,4 @@ Version: 0.3
 Corresponding test files:
 Correct_Test_0, Incorrect_Test_9, Incorrect_Test_10, Incorrect_Test_11
 Additions to Go subset: 
--single import declarations, alphanumerical strings
-
-Date:
-Corresponding test files: [TESTS TO BE ADDED]
-Additions to Go subset:
--simple function declarations
--variable declaration and assignment: short, long, static, dynamic, top-level, in-function
--function calls
--line comments
-
+-single import declarations, alphanumeric strings

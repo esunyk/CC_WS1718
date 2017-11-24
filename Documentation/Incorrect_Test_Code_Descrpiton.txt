@@ -1,3 +1,5 @@
+Tests created before implementing task:
+
 File: Incorrect_Test_0
 Error: "main" and "func" are swapped
 Possible error Messages: "Unexpected <token>" 
@@ -33,6 +35,9 @@ Possible error messages:  "Expected '}', found <token>"
 File: Incorrect_Test_8
 Error: entire file complete nonsense -> no beginning
 Possible error messages: "Expected 'package', found <token>"
+
+
+Tests created after implementing task:
 
 File: Incorrect_Test_9
 Error: missing " after opening string for import path

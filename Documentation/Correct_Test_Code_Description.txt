@@ -1,9 +1,7 @@
 File Name: Correct_Test_0
-Date: 22.11.2017
-Description: same as test 1 but with recursion implementation with import declarations
+Description: same as test 1 but with recursion testing (multiple import declarations)
 
 File Name: Correct_Test_1
-Date: 03.11.2017
 Description: Simplest possible test code, includes package declaration and empty main function
 
   
