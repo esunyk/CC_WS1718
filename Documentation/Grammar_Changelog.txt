@@ -30,3 +30,33 @@ Corresponding test files:
 Correct_Test_0, Incorrect_Test_9, Incorrect_Test_10, Incorrect_Test_11
 Additions to Go subset: 
 -single import declarations, alphanumeric strings
+
+
+Date: 03.12.2017
+Version: 1.0
+Corresponding test files:
+-
+Additions to Go subset: 
+-
+Additional Information: 
+Reworked grammar to remove epsilon productions, 
+reflected the fact that "main" is just another identifier (with a special semantic meaning)
+
+
+Date: 03.12.2017
+Version: 1.0 EBNF
+Corresponding test files:
+-
+Additions to Go subset: 
+-
+Additional Information: 
+accepts same subset as 1.0, but the rules are expressed in EBNF, closely oriented at the official Go spec
+
+Date: 03.12.2017
+Version: 1.0 BNF
+Corresponding test files:
+-
+Additions to Go subset: 
+-
+Additional Information: 
+changed EBNF to BNF (removed repetition)

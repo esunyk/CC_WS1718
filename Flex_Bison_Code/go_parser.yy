@@ -5,7 +5,6 @@
 
 %code requires {
 #include <string>
-#include "Token.h"
 class go_driver;
 }
 
@@ -38,19 +37,19 @@ class go_driver;
 SymbolTable* symbolTable;
 }
 
-%define api.token.prefix {TOK_}
+// %define api.token.prefix {TOK_}
 // same as lexer
 %token        	END      	0 		"end of file" 
-%token	<std::string>	id		 	"identifier"  
-%token	<std::string>	tok_semicolon		";"
-%token	<std::string>	tok_lparen		"("
-%token	<std::string>	tok_rparen		")"
-%token	<std::string>	tok_lcurly		"{"
-%token	<std::string>	tok_rcurly		"}" 
-%token	<std::string>	tok_package "package"
-%token	<std::string>	tok_main 		"main"
-%token	<std::string>	tok_imp 		"import"
-%token	<std::string>	tok_func 		"func"
+%token	<std::string>	ID		 	"identifier"  
+%token	<std::string>	PID		 	"package_identifier" 
+%token	<std::string>	SEMICOLON		";"
+%token	<std::string>	LPAREN			"("
+%token	<std::string>	RPAREN			")"
+%token	<std::string>	LCURLY			"{"
+%token	<std::string>	RCURLY			"}" 
+%token	<std::string>	PACKAGE			 "package"
+%token	<std::string>	IMPORT		 		"import"
+%token	<std::string>	FUNC	 		"func"
 %token	<int>	NUMBER     			"number" 
 ;  
 %type 	<sval>	importpath   
@@ -77,38 +76,27 @@ SymbolTable* symbolTable;
 %start s;
 
 s
-	: sourcefile  { driver.result = 1; };
-sourcefile
-	:  "package" packagedeclarationrest {};
-
-packagedeclarationrest
-	: "main" ";" importdeclaration mainbody
-    | packageidentifier ";" importdeclaration body;
-
-importdeclaration
-	: "import" importpath ";" importdeclaration
+	: source_file  { driver.result = 1; };
+source_file
+	: package_declaration SEMICOLON import_declaration toplevel_declaration {};
+package_declaration
+	: PACKAGE PID {};
+import_declaration
+	: import_declaration "import" import_path ";"
 	| %empty;
-
-importpath
-	: id { $$ = $1;}; 
-
-mainbody
-	: topleveldeclaration mainfunc topleveldeclaration;
-
-body
-	: topleveldeclaration;
-
-topleveldeclaration
-	: %empty;
-
-mainfunc
-	: "func" "main" "(" ")" "{" voidfuncbody "}";
-
-voidfuncbody
-	: %empty;
-
-packageidentifier
-	: id { $$ = $1;}; 
+import_path:
+	STRING;
+toplevel_declaration
+	: toplevel_declaration “func” function_name function
+	| %empty;
+function_name
+	:ID;
+function 
+	: signature_rest function_body;
+signature_rest
+	: LPAREN RPAREN;
+function_body
+	: LCURLY RCURLY; 
 
 %%
 

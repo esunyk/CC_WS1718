@@ -15,13 +15,12 @@ enum Token {
 	tok_lcurly = -7,		// {
 	tok_rcurly = -8,		// }
 	tok_semicolon = -9,	// ;
-	tok_main = -10,		// main
-	tok_package = -11,	// package
-	tok_func = -12,		// func
-	tok_imp = -13,		// import
-	tok_var = -14,		// var
-	tok_lcomment = -15,  // linecomment
-	tok_string = -16     //proto-string (only alnum)
+	tok_package = -10,	// package
+	tok_func = -11,		// func
+	tok_imp = -12,		// import
+	tok_var = -13,		// var
+	tok_lcomment = -14,  // linecomment
+	tok_string = -15     //proto-string (only alnum)
 };
 
 #endif

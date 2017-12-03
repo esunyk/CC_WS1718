@@ -10,23 +10,22 @@ letter 	[a-zA-Z]
 
 %%
 
-";"		    { return tok_semicolon; }
-"("         { return tok_lparen; }
-")"		    { return tok_rparen; }
-"{"		    { return tok_lcurly; }
-"}"		    { return tok_rcurly; }
-"main"      { return tok_main; }
-"package"	{ return tok_package; }
-"func"		{ return tok_func; }
-"import" 	{ return tok_imp; }
-"var"		{ return tok_var; }
+";"		    { return SEMICOLON; }
+"("         { return LPAREN; }
+")"		    { return RPAREN; }
+"{"		    { return LCURLY; }
+"}"		    { return RCURLY; }
+"package"	{ return PACKAGE; }
+"func"		{ return FUNC; }
+"import" 	{ return IMPORT; }
+"var"		{ return VAR; }
 
-{letter}({letter}|{digit})* 	{ return tok_id; }
+{letter}({letter}|{digit})* 	{ return ID; }
 {digit}+						{ yylval = atoi(yytext); 
-								  return tok_number;
+								  return NUMBER;
 								} 
 [ \t\n\r]			
-<<EOF>> 						{ return tok_eof; }
+<<EOF>> 						{ return EOF; }
 
 %%
 
@@ -39,7 +38,7 @@ int main (int argc, char *argv[]) {
 	yyin = ((argc == 2)? fopen(argv[1], "r")
 						: stdin);
     yylex();
-	while (tok != tok_eof) {
+	while (tok != EOF) {
 		tok = yylex();
 		std::cout << "token: " << tok << " value: " << yylval;
 	};
