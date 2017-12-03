@@ -82,13 +82,13 @@ source_file
 package_declaration
 	: PACKAGE PID {};
 import_declaration
-	: import_declaration "import" import_path ";"
-	| %empty;
+	: import_declaration IMPORT import_path SEMICOLON
+	| IMPORT import_path SEMICOLON;
 import_path:
 	STRING;
 toplevel_declaration
-	: toplevel_declaration “func” function_name function
-	| %empty;
+	: toplevel_declaration FUNC function_name function
+	| FUNC function_name function;
 function_name
 	:ID;
 function 
