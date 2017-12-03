@@ -60,3 +60,12 @@ Additions to Go subset:
 -
 Additional Information: 
 changed EBNF to BNF (removed repetition)
+
+Date: 03.12.2017
+Version: 1.0 BNF no epsilon
+Corresponding test files:
+-
+Additions to Go subset: 
+-
+Additional Information: 
+removed epsilon productions from grammar
