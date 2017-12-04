@@ -1,86 +1,67 @@
-%skeleton "lalr1.cc" /* -*- C++ bison -*- */
-%require "2.6.90.8-d4fe"
-%defines
-%define parser_class_name {"go_parser"}
+/* DECLARATIONS */
 
-%code requires {
-#include <string>
-class go_driver;
-}
-
-// The parsing context.
-%parse-param { go_driver& driver }
-%lex-param   { go_driver& driver }
-
-%locations
-%initial-action
-{
-  // Initialize the initial location.
-  @$.begin.filename = @$.end.filename = &driver.file;
-};
-
+%skeleton "lalr1.cc"
+%language "c++"
 %debug
 %error-verbose
+%defines
+%define api.token.constructor //type safety
+%define api.value.type variant //we use genuine types and not union 
+%define parse.assert //proper usage
+%code{
+	#include <iostream>
+	#include <string>
+	#include "lex.yy.cc"
+	#define YY_DECL yy::parser::symbol_type yylex() 
+	#define yyterminate() parser::make_END(); //since default returns int and we're using types
+	YY_DECL;
+%}
 
-// Symbols.
-// 
-// Compare Bison Manual
-// Section 3.8.4 The Collection of Value Types
-// https://www.gnu.org/software/bison/manual/html_node/Union-Decl.html
-%union
-{ 
-  std::string* sval;
-};
+//todo: add ast, add to types for nonterminals
 
-%code {
-# include "go_driver.hh" 
-SymbolTable* symbolTable;
-}
-
-// %define api.token.prefix {TOK_}
-// same as lexer
+//c++ variant with complete type instead of union type declaration recommended by bison
 %token        	END      	0 		"end of file" 
 %token	<std::string>	ID		 	"identifier"  
 %token	<std::string>	PID		 	"package_identifier" 
-%token	<std::string>	SEMICOLON		";"
-%token	<std::string>	LPAREN			"("
-%token	<std::string>	RPAREN			")"
-%token	<std::string>	LCURLY			"{"
-%token	<std::string>	RCURLY			"}" 
-%token	<std::string>	PACKAGE			 "package"
-%token	<std::string>	IMPORT		 		"import"
-%token	<std::string>	FUNC	 		"func"
-%token	<int>	NUMBER     			"number" 
-;  
-%type 	<sval>	importpath   
-%type 	<sval>	packageidentifier   
+%token	<std::string>	SEMICOLON	";"
+%token	<std::string>	LPAREN		"("
+%token	<std::string>	RPAREN		")"
+%token	<std::string>	LCURLY		"{"
+%token	<std::string>	RCURLY		"}" 
+%token	<std::string>	PACKAGE		"package"
+%token	<std::string>	IMPORT		"import"
+%token	<std::string>	FUNC	 	"func"
+%token	<int>			NUMBER     	"number" 
+%token	<std::string>	STRING     	"string" 
+%token	<std::string>	LETTER    	"letter" 
 
-// Printer Macro is used for tracing the parser,
-// Compare Bison Manual
-// Section 3.8.8 Printing Semantic Values
-%printer    { yyoutput << *$$; } "identifier"
-
-// Destructor Macro is used with error recovery
-// Compare Bison Manual
-// Section 3.8.7 Freeing Discarded Symbols
-%destructor { delete $$; } "identifier"
-
-%printer    { yyoutput << $$; } <sval>
-
+%type <std::string> s;
+%type <std::string> source_file;
+%type <std::string> package_declaration;
+%type <std::string> import_declaration;
+%type <std::string> import_path;
+%type <std::string> toplevel_declaration;
+%type <std::string> function_name;
+%type <std::string> function;
+%type <std::string> signature_rest;
+%type <std::string> function_body;
 
 %%
+/* RULES */
 /*
-	startet bei s
-	TODO: eventuell für jede regel: { $$ = createAST(token, $1...n); } erstellen?
+start symbol: s
 */
 %start s;
 
 s
-	: source_file  { driver.result = 1; };
+	: source_file;
 source_file
-	: package_declaration SEMICOLON import_declaration toplevel_declaration {};
+	: package_declaration SEMICOLON import_declaration toplevel_declaration;
 package_declaration
-	: PACKAGE PID {};
+	: PACKAGE package_name;
+package_name
+	: PID
+	| LETTER; 
 import_declaration
 	: import_declaration IMPORT import_path SEMICOLON
 	| IMPORT import_path SEMICOLON;
@@ -90,7 +71,8 @@ toplevel_declaration
 	: toplevel_declaration FUNC function_name function
 	| FUNC function_name function;
 function_name
-	:ID;
+	:ID
+	| PID;
 function 
 	: signature_rest function_body;
 signature_rest
@@ -99,8 +81,4 @@ function_body
 	: LCURLY RCURLY; 
 
 %%
-
-void
-yy::go_parser::error(const yy::go_parser::location_type& l, const std::string& m) {
-  driver.error (l, m);
-}
+/* PROGRAM */

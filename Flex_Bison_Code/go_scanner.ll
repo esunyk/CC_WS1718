@@ -1,49 +1,53 @@
 /* flex */
-%{
+/* DECLARATIONS */
+%option c++
+%top{
 	#include <iostream>
-	#include "Token.h"
-	int yylval = 0;  
+	#include <string>
+	#include <stdlib.h>     /* atoi */
+	#include "go_parser.tab.hh"
+	#define YY_DECL yy::parser::symbol_type yylex()
+	
+	int line = 1;
+	int position = 0;
 %}
 
 digit 	[0-9]
 letter 	[a-zA-Z]
+ws		[ \t\n\r]
+string	\"[a-zA-Z0-9]+\"
 
 %%
 
-";"		    { return SEMICOLON; }
-"("         { return LPAREN; }
-")"		    { return RPAREN; }
-"{"		    { return LCURLY; }
-"}"		    { return RCURLY; }
-"package"	{ return PACKAGE; }
-"func"		{ return FUNC; }
-"import" 	{ return IMPORT; }
-"var"		{ return VAR; }
+";"		    { ECHO; return yy::parser::make_SEMICOLON(yytext); }
+"("         { ECHO; return yy::parser::make_LPAREN(yytext); }
+")"		    { ECHO; return yy::parser::make_RPAREN(yytext); }
+"{"		    { ECHO; return yy::parser::make_LCURLY(yytext);}
+"}"		    { ECHO; return yy::parser::make_RCURLY(yytext); }
+"package"	{ ECHO; return yy::parser::make_PACKAGE(yytext); }
+"func"		{ ECHO; return yy::parser::make_FUNC(yytext); }
+"import" 	{ ECHO; return yy::parser::make_IMPORT(yytext);}
 
-{letter}({letter}|{digit})* 	{ return ID; }
-{digit}+						{ yylval = atoi(yytext); 
-								  return NUMBER;
+{letter}						{
+								ECO; 
+								return yy::parser::make_LETTER(yytext);}
+({letter})({letter}|{digit}|"_")* {
+									ECHO;
+									return yy::parser::make_PID(yytext);}
+({letter}|"_")({letter}|{digit}|"_")* 	{ 
+									ECHO;
+									return yy::parser::make_ID(yytext); }
+{digit}+						{
+								ECHO;
+								  return yy::parser::make_NUMBER(atoi(yytext));;
 								} 
-[ \t\n\r]			
-<<EOF>> 						{ return EOF; }
+{ws}								/* do nothing */
+{string}						{
+								ECHO;
+								return yy::parser::make_STRING(yytext);}
+<<EOF>> 						{ return yy::parser::make_END(); }
 
 %%
 
-int yywrap(void) { return 1; }
-
-int main (int argc, char *argv[]) {
-
-	int tok = -1;
-	// falls datei existiert, laden | von user lesen
-	yyin = ((argc == 2)? fopen(argv[1], "r")
-						: stdin);
-    yylex();
-	while (tok != EOF) {
-		tok = yylex();
-		std::cout << "token: " << tok << " value: " << yylval;
-	};
-    fclose(yyin);
-	return 0;
-}
 
 
