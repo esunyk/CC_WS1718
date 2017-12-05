@@ -1,53 +1,81 @@
-/* flex */
-/* DECLARATIONS */
-%option c++
-%top{
-	#include <iostream>
-	#include <string>
-	#include <stdlib.h>     /* atoi */
-	#include "go_parser.tab.hh"
-	#define YY_DECL yy::parser::symbol_type yylex()
-	
-	int line = 1;
-	int position = 0;
-%}
+/***********************
+ * Lexer for minimal subset of golang, based on the Calc++ Flex example
+ *
+ ***********************/
+%{ /* -*- C++ -*- */
+# include <cerrno>
+# include <climits>
+# include <cstdlib>
+# include <string>
+# include "go_driver.hh"
+# include "go_parser.hh"
 
+// Work around an incompatibility in flex (at least versions
+// 2.5.31 through 2.5.33): it generates code that does
+// not conform to C89.  See Debian bug 333231
+// <http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=333231>.
+# undef yywrap
+# define yywrap() 1
+
+// The location of the current token.
+static yy::location loc;
+%}
+%option noyywrap nounput batch debug noinput
 digit 	[0-9]
 letter 	[a-zA-Z]
-ws		[ \t\n\r]
+ws		[ \t]
 string	\"[a-zA-Z0-9]+\"
 
-%%
-
-";"		    { ECHO; return yy::parser::make_SEMICOLON(yytext); }
-"("         { ECHO; return yy::parser::make_LPAREN(yytext); }
-")"		    { ECHO; return yy::parser::make_RPAREN(yytext); }
-"{"		    { ECHO; return yy::parser::make_LCURLY(yytext);}
-"}"		    { ECHO; return yy::parser::make_RCURLY(yytext); }
-"package"	{ ECHO; return yy::parser::make_PACKAGE(yytext); }
-"func"		{ ECHO; return yy::parser::make_FUNC(yytext); }
-"import" 	{ ECHO; return yy::parser::make_IMPORT(yytext);}
-
-{letter}						{
-								ECO; 
-								return yy::parser::make_LETTER(yytext);}
-({letter})({letter}|{digit}|"_")* {
-									ECHO;
-									return yy::parser::make_PID(yytext);}
-({letter}|"_")({letter}|{digit}|"_")* 	{ 
-									ECHO;
-									return yy::parser::make_ID(yytext); }
-{digit}+						{
-								ECHO;
-								  return yy::parser::make_NUMBER(atoi(yytext));;
-								} 
-{ws}								/* do nothing */
-{string}						{
-								ECHO;
-								return yy::parser::make_STRING(yytext);}
-<<EOF>> 						{ return yy::parser::make_END(); }
+%{
+  // Code run each time a pattern is matched.
+  # define YY_USER_ACTION  loc.columns (yyleng);
+%}
 
 %%
 
+%{
+  // Code run each time yylex is called.
+  loc.step ();
+%}
 
+";"		    {return yy::go_parser::make_SEMICOLON(loc); }
+"("         {return yy::go_parser::make_LPAREN(loc); }
+")"		    {return yy::go_parser::make_RPAREN(loc); }
+"{"		    {return yy::go_parser::make_LCURLY(loc);}
+"}"		    {return yy::go_parser::make_RCURLY(loc); }
+"package"	{return yy::go_parser::make_PACKAGE(loc); }
+"func"		{return yy::go_parser::make_FUNC(loc); }
+"import" 	{return yy::go_parser::make_IMPORT(loc);}
+
+{letter}								{return yy::go_parser::make_LETTER(yytext, loc);}
+({letter})({letter}|{digit}|"_")* 		{return yy::go_parser::make_PID(yytext, loc);}
+({letter}|"_")({letter}|{digit}|"_")* 	{return yy::go_parser::make_ID(yytext, loc); }
+{digit}+								{return yy::go_parser::make_NUMBER(strtol(yytext, NULL, 10), loc);} 
+{ws}+									{loc.step();}
+[\n]+      								{loc.lines(yyleng); loc.step();}
+{string}								{return yy::go_parser::make_STRING(yytext, loc);}
+.          								{driver.error (loc, "invalid character");}
+<<EOF>> 								{return yy::go_parser::make_END(loc); }
+%%
+
+void
+go_driver::scan_begin ()
+{
+  yy_flex_debug = trace_scanning;
+  if (file.empty () || file == "-")
+    yyin = stdin;
+  else if (!(yyin = fopen (file.c_str (), "r")))
+    {
+      error ("cannot open " + file + ": " + strerror(errno));
+      exit (EXIT_FAILURE);
+    }
+}
+
+
+
+void
+go_driver::scan_end ()
+{
+  fclose (yyin);
+}
 

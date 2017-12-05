@@ -1,40 +1,60 @@
-/* DECLARATIONS */
+/***********************
+* Parser for minimal subset of golang, based on Calc++ Bison example
+*
+ ***********************/
 
-%skeleton "lalr1.cc"
-%language "c++"
-%debug
-%error-verbose
+%skeleton "lalr1.cc" /* -*- C++ -*- */
+%require "3.0.2"
 %defines
-%define api.token.constructor //type safety
-%define api.value.type variant //we use genuine types and not union 
-%define parse.assert //proper usage
-%code{
-	#include <iostream>
-	#include <string>
-	#include "lex.yy.cc"
-	#define YY_DECL yy::parser::symbol_type yylex() 
-	#define yyterminate() parser::make_END(); //since default returns int and we're using types
-	YY_DECL;
-%}
+%define parser_class_name {go_parser}
+%define api.token.constructor
+%define api.value.type variant //save real data types onto value stack
+%define parse.assert
 
-//todo: add ast, add to types for nonterminals
+%code requires
+{
+# include <string>
+# include "AST.h"
+class go_driver;
+}
 
-//c++ variant with complete type instead of union type declaration recommended by bison
-%token        	END      	0 		"end of file" 
+// The parsing context.
+%param { go_driver& driver }
+
+%locations
+%initial-action
+{
+  // Initialize the initial location.
+  @$.begin.filename = @$.end.filename = &driver.file;
+};
+
+%define parse.trace
+%define parse.error verbose
+
+%code
+{
+# include "go_driver.hh"
+}
+
+%define api.token.prefix {TOK_} //avoid naming conflicts
+%token
+  END  0  "end of file"
+  SEMICOLON	";"
+  LPAREN	"("
+  RPAREN	")"
+  LCURLY	"{"
+  RCURLY	"}" 
+  PACKAGE	"package"
+  IMPORT	"import"
+  FUNC	 	"func"
+;
 %token	<std::string>	ID		 	"identifier"  
 %token	<std::string>	PID		 	"package_identifier" 
-%token	<std::string>	SEMICOLON	";"
-%token	<std::string>	LPAREN		"("
-%token	<std::string>	RPAREN		")"
-%token	<std::string>	LCURLY		"{"
-%token	<std::string>	RCURLY		"}" 
-%token	<std::string>	PACKAGE		"package"
-%token	<std::string>	IMPORT		"import"
-%token	<std::string>	FUNC	 	"func"
 %token	<int>			NUMBER     	"number" 
 %token	<std::string>	STRING     	"string" 
-%token	<std::string>	LETTER    	"letter" 
-
+%token	<std::string>	LETTER    	"letter"
+ 
+	//types for nonterminals
 %type <std::string> s;
 %type <std::string> source_file;
 %type <std::string> package_declaration;
@@ -46,39 +66,49 @@
 %type <std::string> signature_rest;
 %type <std::string> function_body;
 
+%printer { yyoutput << $$; } <*>;
+
 %%
-/* RULES */
+/* RULES 
+
+*/
 /*
 start symbol: s
 */
 %start s;
 
 s
-	: source_file;
+	: source_file{ driver.result = 1; };
 source_file
-	: package_declaration SEMICOLON import_declaration toplevel_declaration;
+	: package_declaration ";" import_declaration {};
 package_declaration
-	: PACKAGE package_name;
+	: "package" package_name {};
 package_name
-	: PID
-	| LETTER; 
+	: "package_identifier"{}
+	| "letter" {};
 import_declaration
-	: import_declaration IMPORT import_path SEMICOLON
-	| IMPORT import_path SEMICOLON;
+	: "import" import_path ";" import_declaration {}
+	|  toplevel_declaration {} ;  //skip for empty imports
+	| "import" import_path ";" {} 
 import_path:
-	STRING;
+	"string" {} ;
 toplevel_declaration
-	: toplevel_declaration FUNC function_name function
-	| FUNC function_name function;
+	: "func" function_name function{} toplevel_declaration
+	| "func" function_name function{};
 function_name
-	:ID
-	| PID;
+	: "package_identifier" {}
+	| "identifier"{};
 function 
-	: signature_rest function_body;
+	: signature_rest function_body {};
 signature_rest
-	: LPAREN RPAREN;
+	: "(" ")" {};
 function_body
-	: LCURLY RCURLY; 
-
+	: "{" "}" {} ; 
 %%
-/* PROGRAM */
+
+void
+yy::go_parser::error (const location_type& l,
+                          const std::string& m)
+{
+  driver.error (l, m);
+}
