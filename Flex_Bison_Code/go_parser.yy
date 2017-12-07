@@ -163,6 +163,7 @@ import_path:
 												   {
 												   std::string errmsg = "ERROR: Duplicate import: " + std::string($1);
 												   driver.error(errmsg);
+												   YYABORT;
 												   }
 												   $$->addNode(new AST("Terminal", std::string($1) , nullptr));
 												   std::vector<AST*> nodes = $$->getNodes();
@@ -197,6 +198,7 @@ function_name
 												   {
 												   std::string errmsg = "ERROR: Duplicate declaration of function " + std::string($1);
 												   driver.error(errmsg);
+												   YYABORT;
 												   }
 												    $$->addNode(new AST("Terminal", std::string($1) , nullptr));
 												   std::vector<AST*> nodes = $$->getNodes();
@@ -211,6 +213,7 @@ function_name
 												   {
 												   std::string errmsg = "ERROR: Duplicate declaration of function " + std::string($1);
 												   driver.error(errmsg);
+												   YYABORT;
 												   }
 												   $$->addNode(new AST("Terminal", std::string($1) , nullptr));
 												   std::vector<AST*> nodes = $$->getNodes();
