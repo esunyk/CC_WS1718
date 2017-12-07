@@ -1,5 +1,4 @@
 #include "AST.h" 
-#include "ParseException.h"
 #include <iostream>
 
 //TODO (maybe): subclass for leaves, i.e. tokens?
@@ -8,6 +7,8 @@ AST::AST(const std::string type, AST* parent) {
 	value = "";
 	this->parent = parent;
 }
+
+AST::AST(){}
 
 std::map<std::string, SymbolTableEntry>& AST::getSymbolTable(){
 	return symbolTable;
@@ -20,7 +21,7 @@ void AST::addSymTabEntry(std::string name, SymbolTableEntry sym){
 	//	throw ParseException("Error: duplicate declaration for import of " + name);
 	//}
 	if (symbolTable.find(name) != symbolTable.end()){
-		throw ParseException("ERROR: \nDuplicate declaration for import of " + name + ".");
+		//throw ParseException("ERROR: \nDuplicate declaration for import of " + name + ".");
 	}
 	else{
 		symbolTable.insert(std::pair<std::string, SymbolTableEntry>(name, sym));
@@ -42,6 +43,14 @@ AST::~AST() {
 
 AST* AST::getParent(){
 	return this->parent;
+}
+
+std::vector<AST*> AST::getNodes(){
+	return this->nodes;
+}
+
+void AST::setParent(AST* parent){
+	this->parent = parent;
 }
 
 void AST::addNode(AST* node) {
@@ -71,15 +80,13 @@ const void AST::printSymbolTable(std::ostream& output){
 		output << "Name: " << entry.first << std::endl; //key
 		SymbolTableEntry e(entry.second);
 		output << "Scope: ";
-		if (this->token == SourceFile || token == PackageDeclarationRest){
-			output << "global" << std::endl;
-		}
+		output << "global" << std::endl;
 		output << "Type: " << e.getType() << std::endl;
 		//TODO with bigger grammar: create scope output for each node type the symbol table is stored at
 		output << "Is a function: ";
-		output << (e.isFunction() ? "Yes" : "No") << std::endl;
-		output << "Name declared on line " << e.getDecLine();
-		output << " , at position " << e.getDecPos() << std::endl;
+		//output << (e.isFunction() ? "Yes" : "No") << std::endl;
+		//output << "Name declared on line " << e.getDecLine();
+		//output << " , at position " << e.getDecPos() << std::endl;
 		output << std::endl;
 	}
 	for (AST* ast : nodes){
@@ -125,9 +132,12 @@ const int AST::strtoint(const std::string type) {
 	if (type == "function_body")
 		return 9;
 	//add more here
+	
+	if (type == "package_name")
+		return 10;
 
 	if (type == "Terminal")
-		return 10;
+		return 11;
 }
 
 // converts token int value to string value
@@ -143,6 +153,7 @@ const std::string AST::inttostr(const int r) {
 	case  7: return "function";
 	case  8: return "signature_rest";
 	case  9: return "function_body";
+	case 10: return "package_name";
 		// more cases to be added
 	default: return "Terminal";
 	}

@@ -32,11 +32,11 @@ YFLAGS=-v -d
 #         calc++-parser.output erzeugt wird, die zwar informativ aber nicht
 #         unbedingt notwendig (sie wird nicht weiterverwendet).
 
-HEADERS=go_parser.hh go_scanner.hh
+HEADERS=go_parser.hh go_scanner.hh AST.h SymbolTableEntry.h
 
-go: go.o go_scanner.o go_parser.o go_driver.o
+go: go.o go_scanner.o go_parser.o go_driver.o AST.o SymbolTableEntry.o
 
-go.o : go.cc go_driver.hh go_parser.hh
+go.o : go.cc go_driver.hh go_parser.hh AST.h
 
 %.o: %.cc
 	$(CC) $(CFLAGS) -o $@ -c $<

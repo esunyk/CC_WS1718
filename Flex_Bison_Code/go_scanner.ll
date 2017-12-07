@@ -9,6 +9,7 @@
 # include <string>
 # include "go_driver.hh"
 # include "go_parser.hh"
+# include "AST.h"
 
 // Work around an incompatibility in flex (at least versions
 // 2.5.31 through 2.5.33): it generates code that does
@@ -20,10 +21,10 @@
 // The location of the current token.
 static yy::location loc;
 %}
-%option noyywrap nounput batch debug noinput
+%option noyywrap nounput batch debug
 digit 	[0-9]
 letter 	[a-zA-Z]
-ws		[ \t]
+ws		[ \t\r]
 string	\"[a-zA-Z0-9]+\"
 
 %{
@@ -38,24 +39,24 @@ string	\"[a-zA-Z0-9]+\"
   loc.step ();
 %}
 
-";"		    {return yy::go_parser::make_SEMICOLON(loc); }
-"("         {return yy::go_parser::make_LPAREN(loc); }
-")"		    {return yy::go_parser::make_RPAREN(loc); }
-"{"		    {return yy::go_parser::make_LCURLY(loc);}
-"}"		    {return yy::go_parser::make_RCURLY(loc); }
-"package"	{return yy::go_parser::make_PACKAGE(loc); }
-"func"		{return yy::go_parser::make_FUNC(loc); }
-"import" 	{return yy::go_parser::make_IMPORT(loc);}
+";"		    {return yy::go_parser::token::TOK_SEMICOLON; }
+"("         {return yy::go_parser::token::TOK_LPAREN; }
+")"		    {return yy::go_parser::token::TOK_RPAREN; }
+"{"		    {return yy::go_parser::token::TOK_LCURLY;}
+"}"		    {return yy::go_parser::token::TOK_RCURLY; }
+"package"	{return yy::go_parser::token::TOK_PACKAGE; }
+"func"		{return yy::go_parser::token::TOK_FUNC; }
+"import" 	{return yy::go_parser::token::TOK_IMPORT;}
 
-{letter}								{return yy::go_parser::make_LETTER(yytext, loc);}
-({letter})({letter}|{digit}|"_")* 		{return yy::go_parser::make_PID(yytext, loc);}
-({letter}|"_")({letter}|{digit}|"_")* 	{return yy::go_parser::make_ID(yytext, loc); }
-{digit}+								{return yy::go_parser::make_NUMBER(strtol(yytext, NULL, 10), loc);} 
+{letter}								{yylval->sval = strdup(yytext); return yy::go_parser::token::TOK_LETTER;}
+({letter})({letter}|{digit}|"_")* 		{yylval->sval = strdup(yytext); return yy::go_parser::token::TOK_PID;}
+({letter}|"_")({letter}|{digit}|"_")* 	{yylval->sval = strdup(yytext); return yy::go_parser::token::TOK_ID; }
+{digit}+								{yylval->sval = strdup(yytext); return yy::go_parser::token::TOK_NUMBER;} //number value only needed for tree, so string is okay
 {ws}+									{loc.step();}
 [\n]+      								{loc.lines(yyleng); loc.step();}
-{string}								{return yy::go_parser::make_STRING(yytext, loc);}
-.          								{driver.error (loc, "invalid character");}
-<<EOF>> 								{return yy::go_parser::make_END(loc); }
+{string}								{yylval->sval = strdup(yytext); return yy::go_parser::token::TOK_STRING;}
+.          								{yylval->sval = strdup(yytext); driver.error (loc, "invalid character");}
+<<EOF>> 								{yylval->sval = strdup(yytext); return yy::go_parser::token::TOK_END; }
 %%
 
 void

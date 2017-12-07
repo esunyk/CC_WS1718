@@ -8,26 +8,23 @@ SymbolTableEntry::~SymbolTableEntry()
 SymbolTableEntry::SymbolTableEntry(){
 
 }
-SymbolTableEntry::SymbolTableEntry(bool function, std::string type, int decLine, int decPos){
-	this->function = function;
+SymbolTableEntry::SymbolTableEntry(std::string type, int decLine, int decPos){
 	this->type = type;
 	this->decLine = decLine;
 	this->decPos = decPos;
 
 }
 
-SymbolTableEntry::SymbolTableEntry(bool function, std::string type, int decLine, int decPos, SymbolTableEntry* entry){
-	this->function = function;
+SymbolTableEntry::SymbolTableEntry(std::string type){
+	this->type = type;
+}
+
+SymbolTableEntry::SymbolTableEntry(std::string type, int decLine, int decPos, SymbolTableEntry* entry){
 	this->type = type;
 	this->decLine = decLine;
 	this->decPos = decPos;
 	this->typeDecl = entry;
 }
-
-bool SymbolTableEntry::isFunction(){
-	return this->function;
-}
-
 int SymbolTableEntry::getDecLine(){
 	return this->decLine;
 }
@@ -38,10 +35,6 @@ int SymbolTableEntry::getDecPos(){
 
 std::string SymbolTableEntry::getType(){
 	return this->type;
-}
-
-void SymbolTableEntry::setFunction(bool function){
-	this->function = function;
 }
 
 void SymbolTableEntry::setDecLine(int decLine){

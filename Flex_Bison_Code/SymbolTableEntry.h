@@ -16,24 +16,22 @@ public:
 	//the package declaration is located at the PackageDeclarationRest node
 
 	SymbolTableEntry(); //needed for switch cases
-	SymbolTableEntry(bool, std::string, int, int);
-	SymbolTableEntry(bool, std::string, int, int, SymbolTableEntry*);
+	SymbolTableEntry(std::string, int, int);
+	SymbolTableEntry(std::string);
+	SymbolTableEntry(std::string, int, int, SymbolTableEntry*);
 	~SymbolTableEntry();
-
-	bool isFunction();
+	
 	int getDecLine();
 	int getDecPos();
 	std::string getType();
 
-	void setFunction(bool);
 	void setDecLine(int);
 	void setDecPos(int);
 	void setType(std::string);
 private:
-	bool function;
-	std::string type;
-	int decLine;
-	int decPos;
+	std::string type = "none";
+	int decLine = 0;
+	int decPos = 0;
 	SymbolTableEntry* typeDecl = nullptr; //declaration of type, for complex types
 };
 

@@ -2,11 +2,17 @@
 # define GO_DRIVER_HH
 # include <string>
 # include <map>
+# include <string>
 # include "go_parser.hh"
+# include "AST.h"
+# include "SymbolTableEntry.h"
 
 // Tell Flex the lexer's prototype ...
 # define YY_DECL \
-  yy::go_parser::symbol_type yylex (go_driver& driver)
+  yy::go_parser::token_type \
+  yylex (yy::go_parser::semantic_type* yylval,      \
+         yy::go_parser::location_type* yylloc,      \
+         go_driver& driver)
 // ... and declare it for the parser's sake.
 YY_DECL;
 
@@ -20,6 +26,14 @@ public:
   std::map<std::string, int> variables;
 
   int result;
+  AST* finalTree;
+  std::map<std::string, SymbolTableEntry> globalVariables;
+  std::map<std::string, SymbolTableEntry> functions;
+  std::map<std::string, SymbolTableEntry> imports;
+  std::string package;
+  
+  bool addSymTabEntry(std::string, SymbolTableEntry, std::map<std::string, SymbolTableEntry>&);
+  void printSymTab(std::ostream&, std::map<std::string, SymbolTableEntry>&);
 
   // Handling the scanner.
   void scan_begin ();
