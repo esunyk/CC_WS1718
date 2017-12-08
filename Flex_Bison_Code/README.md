@@ -12,8 +12,8 @@ and the C++11 flag to the one accepted by the command.
 __Parameters__
 -p (optional): enable parse tracing for input
 -s (optional): enable scanner tracing for input
-The last parameter (required) should be either a file path or __-m__. In the first case the file is taken as input,
-in the second case user input is taken interactively, written to a temporary file and used as input.
+The last parameter (required) should be either a file path or __-m__. In the first case the file is used as input,
+in the second case user input is taken interactively and written to a temporary file, which is then used as input.
 
 ## Directory Contents
 
