@@ -9,10 +9,8 @@
 
 // Tell Flex the lexer's prototype ...
 # define YY_DECL \
-  yy::go_parser::token_type \
-  yylex (yy::go_parser::semantic_type* yylval,      \
-         yy::go_parser::location_type* yylloc,      \
-         go_driver& driver)
+  yy::go_parser::symbol_type \
+  yylex (go_driver& driver) \
 // ... and declare it for the parser's sake.
 YY_DECL;
 
@@ -27,9 +25,11 @@ public:
 
   int result;
   AST* finalTree;
+  //global scope symbol tables, the other scope symbol tables are be located at the appropriate node in the tree 
   std::map<std::string, SymbolTableEntry> globalVariables;
   std::map<std::string, SymbolTableEntry> functions;
   std::map<std::string, SymbolTableEntry> imports;
+  //package name 
   std::string package;
   
   bool addSymTabEntry(std::string, SymbolTableEntry, std::map<std::string, SymbolTableEntry>&);

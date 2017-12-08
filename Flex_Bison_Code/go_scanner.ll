@@ -39,30 +39,28 @@ string	\"[a-zA-Z0-9]+\"
   loc.step ();
 %}
 
-";"		    {return yy::go_parser::token::TOK_SEMICOLON; }
-"("         {return yy::go_parser::token::TOK_LPAREN; }
-")"		    {return yy::go_parser::token::TOK_RPAREN; }
-"{"		    {return yy::go_parser::token::TOK_LCURLY;}
-"}"		    {return yy::go_parser::token::TOK_RCURLY; }
-"package"	{return yy::go_parser::token::TOK_PACKAGE; }
-"func"		{return yy::go_parser::token::TOK_FUNC; }
-"import" 	{return yy::go_parser::token::TOK_IMPORT;}
+";"		    {return yy::go_parser::make_SEMICOLON(loc); }
+"("         {return yy::go_parser::make_LPAREN(loc); }
+")"		    {return yy::go_parser::make_RPAREN(loc); }
+"{"		    {return yy::go_parser::make_LCURLY(loc);}
+"}"		    {return yy::go_parser::make_RCURLY(loc); }
+"package"	{return yy::go_parser::make_PACKAGE(loc); }
+"func"		{return yy::go_parser::make_FUNC(loc); }
+"import" 	{return yy::go_parser::make_IMPORT(loc);}
 
-{letter}								{yylval->sval = strdup(yytext); return yy::go_parser::token::TOK_LETTER;}
-({letter})({letter}|{digit}|"_")* 		{yylval->sval = strdup(yytext); return yy::go_parser::token::TOK_PID;}
-({letter}|"_")({letter}|{digit}|"_")* 	{yylval->sval = strdup(yytext); return yy::go_parser::token::TOK_ID; }
+{letter}								{return yy::go_parser::make_LETTER(yytext, loc);}
+({letter})({letter}|{digit}|"_")* 		{return yy::go_parser::make_PID(yytext, loc);}
+({letter}|"_")({letter}|{digit}|"_")* 	{return yy::go_parser::make_ID(yytext, loc); }
 {digit}+								{long n = (int) strtol (yytext, NULL, 10);
 										  errno = 0;
 										  if (! (INT_MIN <= n && n <= INT_MAX && errno != ERANGE))
 											{driver.error (loc, "integer is out of range");}
-										  else{
-											yylval->ival = (int) n;}
-										return yy::go_parser::token::TOK_INT;}
+										return yy::go_parser::make_INT(n, loc);}
 {ws}+									{loc.step();}
 [\n]+      								{loc.lines(yyleng); loc.step();}
-{string}								{yylval->sval = strdup(yytext); return yy::go_parser::token::TOK_STRING;}
-.          								{yylval->sval = strdup(yytext); driver.error (loc, "invalid character");}
-<<EOF>> 								{yylval->sval = strdup(yytext); return yy::go_parser::token::TOK_END; }
+{string}								{return yy::go_parser::make_STRING(yytext, loc);}
+.          								{driver.error (loc, "invalid character");}
+<<EOF>> 								{return yy::go_parser::make_END(loc); }
 %%
 
 void

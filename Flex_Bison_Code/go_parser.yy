@@ -7,9 +7,9 @@
 %require "3.0.2"
 %defines
 %define parser_class_name {go_parser}
-//%define api.token.constructor //only for value type variant
-//%define api.value.type union //automatic union struct inferred from types
-//%define parse.assert
+%define api.token.constructor //only for value type variant
+%define api.value.type variant //does work after all, there was probably a logical error or typo last time
+%define parse.assert
 
 %code requires //required in this file
 {
@@ -32,19 +32,21 @@ class go_driver;
 %define parse.trace
 %define parse.error verbose //verbose error messages
 
-%code //required in target file -> pasted to top
+%code //required in target file
 {
 # include "go_driver.hh"
 # include "AST.h"
 # include "SymbolTableEntry.h"
 }
 
+/*
 %union
 {
 AST *ast;
 char *sval;
 int ival;
 }
+*/
 
 %define api.token.prefix {TOK_} //avoid naming conflicts
 %token //tokens that can only have one semantic value
@@ -59,26 +61,24 @@ int ival;
   FUNC	 		"func"
 ;
 	//rest of tokens: different semantic values, but are syntactically equivalent
-%token	<sval>			ID		 	"identifier"  
-%token	<sval>			PID		 	"package_identifier" 
-%token	<ival>			INT     	"integer" //not used in grammar yet, only token exists
-%token	<sval>			STRING     	"string" 
-%token	<sval>			LETTER    	"letter"
+%token	<std::string>			ID		 	"identifier"  
+%token	<std::string>			PID		 	"package_identifier" 
+%token	<int>					INT     	"integer" //not used in grammar yet, only token exists
+%token	<std::string>			STRING     	"string" 
+%token	<std::string>			LETTER    	"letter"
  
 	//types for nonterminals
-%type <ast> source_file;
-%type <ast> package_declaration;
-%type <ast> import_declaration;
-%type <ast> import_path;
-%type <ast> toplevel_declaration;
-%type <ast> function_name;
-%type <ast> package_name;
-%type <ast> function;
-%type <ast> signature_rest;
-%type <ast> function_body;
+%type <AST*> source_file;
+%type <AST*> package_declaration;
+%type <AST*> import_declaration;
+%type <AST*> import_path;
+%type <AST*> toplevel_declaration;
+%type <AST*> function_name;
+%type <AST*> package_name;
+%type <AST*> function;
+%type <AST*> signature_rest;
+%type <AST*> function_body;
 
-	//TODO?: add toString in AST
-	//%printer { yyoutput << $$; } <*>;
 %%
 /* RULES 
    no epsilon rules: lead to shift/reduce conflicts
@@ -159,11 +159,12 @@ import_declaration
 												   }} ;  //when done with imports
 import_path:
 	"string" 								{$$ = new AST("import_path", nullptr);
-												   SymbolTableEntry sym;
+												   SymbolTableEntry sym; 
+												   //try to add entry to proper table, print error and stop parsing if duplicate
 												   if(!driver.addSymTabEntry(std::string($1), sym, driver.imports))
 												   {
 												   std::string errmsg = "ERROR: Duplicate import: " + std::string($1);
-												   driver.error(errmsg);
+												   driver.error(@1, errmsg);
 												   YYABORT;
 												   }
 												   $$->addNode(new AST("Terminal", std::string($1) , nullptr));
@@ -198,7 +199,7 @@ function_name
 												   if(!driver.addSymTabEntry(std::string($1), sym, driver.functions))
 												   {
 												   std::string errmsg = "ERROR: Duplicate declaration of function " + std::string($1);
-												   driver.error(errmsg);
+												   driver.error(@1, errmsg);
 												   YYABORT;
 												   }
 												    $$->addNode(new AST("Terminal", std::string($1) , nullptr));
@@ -213,7 +214,7 @@ function_name
 												   if(!driver.addSymTabEntry(std::string($1), sym, driver.functions))
 												   {
 												   std::string errmsg = "ERROR: Duplicate declaration of function " + std::string($1);
-												   driver.error(errmsg);
+												   driver.error(@1, errmsg);
 												   YYABORT;
 												   }
 												   $$->addNode(new AST("Terminal", std::string($1) , nullptr));

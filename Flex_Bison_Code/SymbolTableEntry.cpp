@@ -15,6 +15,12 @@ SymbolTableEntry::SymbolTableEntry(std::string type, int decLine, int decPos){
 
 }
 
+SymbolTableEntry::SymbolTableEntry(int decLine, int decPos){
+	this->decLine = decLine;
+	this->decPos = decPos;
+
+}
+
 SymbolTableEntry::SymbolTableEntry(std::string type){
 	this->type = type;
 }
