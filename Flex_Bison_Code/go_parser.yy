@@ -43,6 +43,7 @@ class go_driver;
 {
 AST *ast;
 char *sval;
+int ival;
 }
 
 %define api.token.prefix {TOK_} //avoid naming conflicts
@@ -60,7 +61,7 @@ char *sval;
 	//rest of tokens: different semantic values, but are syntactically equivalent
 %token	<sval>			ID		 	"identifier"  
 %token	<sval>			PID		 	"package_identifier" 
-%token	<sval>			NUMBER     	"number" 
+%token	<ival>			INT     	"integer" //not used in grammar yet, only token exists
 %token	<sval>			STRING     	"string" 
 %token	<sval>			LETTER    	"letter"
  
@@ -80,7 +81,7 @@ char *sval;
 	//%printer { yyoutput << $$; } <*>;
 %%
 /* RULES 
-
+   no epsilon rules: lead to shift/reduce conflicts
 */
 /*
 start symbol: s

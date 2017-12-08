@@ -51,7 +51,13 @@ string	\"[a-zA-Z0-9]+\"
 {letter}								{yylval->sval = strdup(yytext); return yy::go_parser::token::TOK_LETTER;}
 ({letter})({letter}|{digit}|"_")* 		{yylval->sval = strdup(yytext); return yy::go_parser::token::TOK_PID;}
 ({letter}|"_")({letter}|{digit}|"_")* 	{yylval->sval = strdup(yytext); return yy::go_parser::token::TOK_ID; }
-{digit}+								{yylval->sval = strdup(yytext); return yy::go_parser::token::TOK_NUMBER;} //number value only needed for tree, so string is okay
+{digit}+								{long n = (int) strtol (yytext, NULL, 10);
+										  errno = 0;
+										  if (! (INT_MIN <= n && n <= INT_MAX && errno != ERANGE))
+											{driver.error (loc, "integer is out of range");}
+										  else{
+											yylval->ival = (int) n;}
+										return yy::go_parser::token::TOK_INT;}
 {ws}+									{loc.step();}
 [\n]+      								{loc.lines(yyleng); loc.step();}
 {string}								{yylval->sval = strdup(yytext); return yy::go_parser::token::TOK_STRING;}
