@@ -20,23 +20,22 @@
 # Uncomment only one of the next two lines (choose your c++ compiler)
 # CC=g++
 CC=clang++
-CFLAGS=-std=c++1y
+LLVM_FLAGS := `llvm-config --cxxflags --ldflags --system-libs --libs all  \
+                   | sed s/no-maybe/no/ `
+CFLAGS=  $(LLVM_FLAGS) -std=c++1y -fexceptions 
 #c++11 with extensions
+#exceptions allowed since bison generates code with try-catch blocks 
 
 LEX=flex
 YACC=bison
 YFLAGS=-v -d
-# Wo   -d wichtig ist, weil damit Header-Dateien erzeugt werden
-#         (*.hh - und nicht nur Quellcode in *.cc)
-# aber -v nicht so wichtig ist, weil damit "nur" die  Datei
-#         calc++-parser.output erzeugt wird, die zwar informativ aber nicht
-#         unbedingt notwendig (sie wird nicht weiterverwendet).
 
 HEADERS=go_parser.hh go_scanner.hh AST.h SymbolTableEntry.h
 
 go: go.o go_scanner.o go_parser.o go_driver.o AST.o SymbolTableEntry.o
+	$(CC) $(CFLAGS) go.o go_scanner.o go_parser.o go_driver.o AST.o SymbolTableEntry.o -o $@
 
-go.o : go.cc go_driver.hh go_parser.hh AST.h
+go.o : go.cc go_driver.hh go_parser.hh AST.h 
 
 %.o: %.cc
 	$(CC) $(CFLAGS) -o $@ -c $<

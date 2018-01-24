@@ -2,13 +2,15 @@
 #include <fstream>
 #include "go_driver.hh"
 #include "AST.h"
+#include "llvm/IR/LLVMContext.h"
 
 
-int
-main (int argc, char *argv[])
+
+int main (int argc, char *argv[])
 {
   int res = 0;
   go_driver driver;
+  llvm::LLVMContext Context;
   AST* finalTree = nullptr;
   for (int i = 1; i < argc; ++i)
 	if (argv[i] == std::string ("-m"))
@@ -18,7 +20,7 @@ main (int argc, char *argv[])
 	std::cout << "Enter go code: (# in a new line to quit)" << std::endl;
 	int i = 1;
 	do {
-		std::cout << i++ << " ";
+	std::cout << i++ << " ";
 		getline(std::cin, loc);
 		if (loc != "#" && loc != ""){ //do not save empty strings
 			code += loc;
