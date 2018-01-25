@@ -2,15 +2,28 @@
 #include <fstream>
 #include "go_driver.hh"
 #include "AST.h"
-#include "llvm/IR/LLVMContext.h"
 
+#include "llvm/LLVMContext.h"
+#include "llvm/Module.h"
+#include "llvm/Support/IRBuilder.h"
 
-
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
+
+	# taken from https://www.ibm.com/developerworks/library/os-createcompilerllvm1/ via moodle
+	# Module(StringRef, LLVMContext&): top level container that contains every llvm object
+	# StringRef: name of the module, irrelevant
+	# LLVMContext: provides context in which elements are created 
+	llvm::LLVMContext& context = llvm::getGlobalContext();
+	llvm::Module* module = new llvm::Module("cc-ws1718", LLVMContext& context);
+
+	# creates LLVM instructions and inserts them into basic blocks
+	llvm::IRBuilder<> builder(context);
+
+	
   int res = 0;
   go_driver driver;
-  llvm::LLVMContext Context;
   AST* finalTree = nullptr;
   for (int i = 1; i < argc; ++i)
 	if (argv[i] == std::string ("-m"))
@@ -20,7 +33,7 @@ int main (int argc, char *argv[])
 	std::cout << "Enter go code: (# in a new line to quit)" << std::endl;
 	int i = 1;
 	do {
-	std::cout << i++ << " ";
+		std::cout << i++ << " ";
 		getline(std::cin, loc);
 		if (loc != "#" && loc != ""){ //do not save empty strings
 			code += loc;
@@ -55,6 +68,31 @@ int main (int argc, char *argv[])
 	std::cout << "Global Variables: " << std::endl;
 	driver.printSymTab(std::cout, driver.globalVariables);
 	//TODO: output global symbol tables
+	
+	
+	llvm::FunctionType *funcType = llvm::FunctionType::get(builder.getVoidTy(), false);
+	llvm::Function *mainFunc = 
+		llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, "main", module);
+	llvm::BasicBlock *entry = llvm::BasicBlock::Create(context, "s", mainFunc);
+	builder.SetInsertPoint(entry);
+
+	# vom root-AST über die Kinder iterieren, 
+	# nach Typ prüfen und davon abhängig neues Element erstellen und anhängen
+	# vllt lieber rekursiv über die Elemente iterieren?
+	AST* current = finalTree->getType();
+	while (?) {	
+		switch (current) {
+			case x: llvm::Value *helloWorld = builder.CreateGlobalStringPtr(current->inttostr());
+				break;
+			...
+		}
+		
+	}
+
+	# show contents of the module
+	module->dump();
+	
+	
 	delete finalTree;}
     else
       res = 1;
