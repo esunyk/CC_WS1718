@@ -37,6 +37,9 @@ go: go.o go_scanner.o go_parser.o go_driver.o AST.o SymbolTableEntry.o
 
 go.o : go.cc go_driver.hh go_parser.hh AST.h 
 
+%.o: %.cpp
+	$(CC) $(CFLAGS) -o $@ -c $<
+
 %.o: %.cc
 	$(CC) $(CFLAGS) -o $@ -c $<
 
